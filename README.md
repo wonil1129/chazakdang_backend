@@ -27,5 +27,13 @@ sex boolean not null,
 preg boolean,
 dis varchar(200)
 
+## eating_history
+
+user_id varchar(50) primary key,
+eating_time datetime not null,
+food_name varchar(30),
+calories float not null,
+sugar float not null
+
 
 성별 논리값 {남 : 1, 여 : 0}
