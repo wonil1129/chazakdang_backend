@@ -1,14 +1,17 @@
 # backend
 
-# LOGIN
+## LOGIN
 http://localhost:3000/api/user/login
 method: POST
 {"user_id":"userid","user_pw":"userpw"}
 
-# REGISTER
+## REGISTER
 http://localhost:3000/api/user/register
 method: POST
 {"user_id":"userid","user_pw":"userpw","user_name":"username"}
 
 # DB
+
+## user
+
 성별 논리값 {남 : 1, 여 : 0}
