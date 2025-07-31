@@ -12,9 +12,24 @@ router.post('/register', async (req, res) => {
     try {
         const hashedPw = await bcrypt.hash(user_pw, 10);
         const sql = `INSERT INTO user (user_id, user_pw, user_name) VALUES (?, ?, ?)`;
+        const sql2 = 'INSERT INTO user_info (user_id) VALUES (?)';
+        const sql3 = 'INSERT INTO eating_history (user_id) VALUES (?)';
+
         db.query(sql, [user_id, hashedPw, user_name], (err, result) => {
             if (err) return res.status(500).json({ msg: 'Register failed', err });
-            return res.status(201).json({ msg: 'User registered' });
+            
+            // user 테이블 성공 후 user_info 테이블 처리
+            db.query(sql2, [user_id], (err2) => {
+                if (err2) return res.status(500).json({ msg: 'Failed to create user info', err2 });
+                
+                // user_info 성공 후 eating_history 테이블 처리
+                db.query(sql3, [user_id], (err3) => {
+                    if (err3) return res.status(500).json({ msg: 'Failed to create eating history', err3 });
+                    
+                    // 모든 테이블 삽입 성공
+                    return res.status(201).json({ msg: 'User registered successfully' });
+                });
+            });
         });
     } catch (err) {
         return res.status(500).json({ msg: 'Server error', err });
