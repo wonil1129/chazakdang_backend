@@ -10,6 +10,17 @@ http://localhost:3000/api/user/register
 method: POST
 {"user_id":"userid","user_pw":"userpw","user_name":"username"}
 
+## 회워탈퇴
+http://localhost:3000/api/user/delete_account
+method: POST
+{"user_id":"userid","user_pw":"userpw"}
+
+## 회원정보조회
+http://localhost:3000/api/user/userinfo
+method: POST
+{"user_id":"userid","user_pw":"userpw"
+
+
 # DB
 
 ## user
