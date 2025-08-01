@@ -1,4 +1,4 @@
-const db = require('../config/db');
+const db = require('../../config/db');
 const { hashPassword, verifyPassword } = require('../utils/hash');
 
 // Register user
