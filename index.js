@@ -5,9 +5,11 @@ const fs = require('fs');
 
 const app = express();
 const userRoutes = require('./src/routes/userRoutes');
+const rankingRoutes = require('./src/routes/rankingRoutes');
 
 app.use(express.json());
 app.use('/api/user', userRoutes);
+app.use('/api/ranking', rankingRoutes);
 
 const sslOptions = {
   key: fs.readFileSync('./cert/server.key'),
