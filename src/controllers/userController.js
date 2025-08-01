@@ -86,3 +86,17 @@ exports.getProfile = (req, res) => {
         });
     });
 }
+
+exports.uploadProfileImage = (req, res) => {
+  const user_id = req.user.id; // JWT에서 추출한 user ID
+  const imagePath = `uploads/profile_images/${req.file.filename}`;
+
+  const sql = 'UPDATE user SET profile_image = ? WHERE user_id = ?';
+  
+  db.query(sql, [imagePath, user_id], (err) => {
+    if(err) {
+      return res.status(500).json({ msg: 'Failed to upload profile image', err });
+    }
+    res.json({ msg: 'Profile image uploaded successfully', image_url: imagePath });
+  });
+};

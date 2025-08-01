@@ -1,3 +1,6 @@
 .env
 node_modules/
-cert/
+cert/*
+!cert/.gitkeep
+uploads/profile_images/*
+!uploads/profile_images/.gitkeep
