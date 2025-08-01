@@ -4,6 +4,7 @@ const { hashPassword, verifyPassword } = require('../utils/hash');
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 // Register user
 exports.register = async (req, res) => {
@@ -53,6 +54,17 @@ exports.login = async (req, res) => {
         const match = await bcrypt.compare(user_pw, user.user_pw);
         if (!match) return res.status(401).json({ msg: 'Invalid credentials' });
 
-        res.json({ msg: 'Login successful', user: { id: user.user_id, name: user.user_name } });
+        // JWT Token 생성
+        const token = jwt.sign(
+          { id: user.user_id, name: user.user_name },
+          process.env.JWT_SECRET,
+          { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
+        );
+
+        res.json({
+          msg: 'Login successful',
+          token,
+          user: { id: user.user_id, name: user.user_name },
+        });
     });
 };
