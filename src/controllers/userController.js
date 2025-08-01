@@ -5,6 +5,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const verifyToken = require('../middleware/auth');
 
 // Register user
 exports.register = async (req, res) => {
@@ -68,3 +69,20 @@ exports.login = async (req, res) => {
         });
     });
 };
+
+// Get user profile
+exports.getProfile = (req, res) => {
+    const userId = req.user.id; // JWT에서 추출한 user ID
+    const sql = `SELECT user_id, user_name FROM user WHERE user_id = ?`;
+
+    db.query(sql, [userId], (err, results) => {
+        if (err || results.length === 0)
+            return res.status(404).json({ msg: 'User not found' });
+
+        const user = results[0];
+        res.json({
+            id: user.user_id,
+            name: user.user_name,
+        });
+    });
+}
