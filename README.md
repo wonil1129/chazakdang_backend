@@ -18,7 +18,7 @@ method: POST
 ## 회원정보조회
 http://localhost:3000/api/user/userinfo
 method: POST
-{"user_id":"userid","user_pw":"userpw"
+{"user_id":"userid","user_pw":"userpw"}
 
 # 제품 이미지 업로드
 http://localhost:3000/api/user/userinfo

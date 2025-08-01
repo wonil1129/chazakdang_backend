@@ -1,10 +1,27 @@
 const express = require('express');
+const https = require('https');
+const http = require('http');
+const fs = require('fs');
+
 const app = express();
 const userRoutes = require('./src/routes/userRoutes');
 
 app.use(express.json());
 app.use('/api/user', userRoutes);
 
-app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000');
+const sslOptions = {
+  key: fs.readFileSync('./cert/server.key'),
+  cert: fs.readFileSync('./cert/server.cert')
+};
+
+https.createServer(sslOptions, app).listen(3000, () => {
+  console.log('HTTPS Server running on port 3000');
 });
+
+
+// http.createServer((req, res) => {
+//   res.writeHead(301, { "Location": "https://" + req.headers.host + req.url });
+//   res.end();
+// }).listen(80);
+
+// ^ http->https 리다이렉트 코드(주석 처리됨, 필요시 사용 가능)
