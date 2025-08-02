@@ -106,6 +106,35 @@ exports.uploadProfileImage = (req, res) => {
   });
 };
 
+exports.uploadProductImage = (req, res) => {
+  const user_id = req.user.id; // JWT에서 추출한 user ID
+  const food_name = "제로콜라";
+  const calories = 0;
+  const protien = 0;
+  const fat = 0;
+  const carbohydrate = 0;
+  const sugar = 0;
+  const sodium = 0;
+  const cholestrol = 0;
+  const saturated_fat = 0;
+  const trans_fat = 0;
+  const food_weight = 0; // Assuming this is a placeholder value
+  const product_image = `uploads/product_images/${req.file.filename}`;
+  const nutrient_image = `uploads/nutrient_images/placeholder.png`; // Placeholder for nutrient image
+
+
+  const sql = 'INSERT INTO eating_history (user_id, eating_time, food_name, calories, protien, fat, carbohydrate, sugar, sodium, cholestrol, saturated_fat, trans_fat, food_weight, product_image, nutrient_image) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+  
+
+
+  db.query(sql, [user_id, ], (err) => {
+    if(err) {
+      return res.status(500).json({ msg: 'Failed to upload profile image', err });
+    }
+    res.json({ msg: 'Product image uploaded successfully' });
+  });
+};
+
 
 // Get detailed user info for calendar
 exports.getDetailedProfile = (req, res) => {
