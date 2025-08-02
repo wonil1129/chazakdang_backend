@@ -170,25 +170,10 @@ exports.getDetailedProfile = (req, res) => {
 exports.deleteAccount = (req, res) => {
   console.log('Deleting account for user:', req.user.id);
   const userId = req.user.id;
+  const sql = 'DELETE FROM user WHERE user_id = ?';
 
-  const deleteHistory = 'DELETE FROM eating_history WHERE user_id = ?';
-  const deleteInfo = 'DELETE FROM user_info WHERE user_id = ?';
-  const deleteUser = 'DELETE FROM user WHERE user_id = ?';
-
-  // 1. 섭취 이력 삭제
-  db.query(deleteHistory, [userId], (err1) => {
-    if (err1) return res.status(500).json({ msg: 'Failed to delete eating history', err1 });
-
-    // 2. 신체 정보 삭제
-    db.query(deleteInfo, [userId], (err2) => {
-      if (err2) return res.status(500).json({ msg: 'Failed to delete user info', err2 });
-
-      // 3. 유저 정보 삭제
-      db.query(deleteUser, [userId], (err3) => {
-        if (err3) return res.status(500).json({ msg: 'Failed to delete user', err3 });
-
-        res.json({ msg: '회원 탈퇴가 완료되었습니다.' });
-      });
-    });
-  });
+  db.query(sql, [userId], (err) => {
+    if (err) return res.status(500).json({ msg: 'Failed to delete eating history', err });
+    res.json({ msg: 'Account deleted successfully' });
+  })
 };
