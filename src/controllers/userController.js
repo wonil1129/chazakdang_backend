@@ -123,7 +123,7 @@ exports.uploadProductImage = (req, res) => {
   const nutrient_image = `uploads/nutrient_images/placeholder.png`; // Placeholder for nutrient image
 
 
-  const sql = 'INSERT INTO eating_history (user_id, eating_time, food_name, calories, protien, fat, carbohydrate, sugar, sodium, cholestrol, saturated_fat, trans_fat, food_weight, product_image, nutrient_image) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+  const sql = 'INSERT INTO eating_history (user_id, eating_time, food_name, calories, protien, fat, carbohydrate, sugar, sodium, cholestrol, saturated_fat, trans_fat, food_weight, product_image, nutrient_image) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
   
 
 
