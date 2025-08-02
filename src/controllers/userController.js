@@ -99,6 +99,7 @@ exports.uploadProfileImage = (req, res) => {
 
 // Get detailed user info for calendar
 exports.getDetailedProfile = (req, res) => {
+  console.log('Fetching detailed profile for user:', req.user.id);
   const userId = req.user.id;
   const sql = `
     SELECT u.user_id, u.user_name, ui.age, ui.height, ui.weight, ui.sex, ui.preg, ui.dis
@@ -126,6 +127,7 @@ exports.getDetailedProfile = (req, res) => {
 };
 
 exports.deleteAccount = (req, res) => {
+  console.log('Deleting account for user:', req.user.id);
   const userId = req.user.id;
 
   const deleteHistory = 'DELETE FROM eating_history WHERE user_id = ?';
