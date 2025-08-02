@@ -16,7 +16,7 @@ exports.register = async (req, res) => {
 
     try {
         const hashedPw = await bcrypt.hash(user_pw, 10);
-        const sql = `INSERT INTO user (user_id, user_pw, user_name) VALUES (?, ?, ?)`;
+        const sql = `INSERT INTO user (user_id, user_pw, user_name, registration_date) VALUES (?, ?, ?, NOW())`;
         const sql2 = 'INSERT INTO user_info (user_id, age, height, weight, sex, preg, dis) VALUES (?, ?, ?, ?, ?, ?, ?)';
         const sql3 = 'INSERT INTO eating_history (user_id) VALUES (?)';
 
