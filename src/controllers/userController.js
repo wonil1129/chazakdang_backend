@@ -106,7 +106,7 @@ exports.uploadProfileImage = (req, res) => {
   });
 };
 
-exports.uploadProductImage = (req, res) => {
+exports.uploadNutrientsImage = (req, res) => {
   const user_id = req.user.id; // JWT에서 추출한 user ID
   const food_name = "제로콜라";
   const calories = 0;
