@@ -42,14 +42,14 @@ method: POST
 ## 프로필 이미지 업로드
 https://localhost:3000/api/user/upload_profile_image
 method: POST
--H "Authorization: Bearer 토큰"
+-H "Authorization: Bearer 토큰" -F "image=@이미지 경로"
 => { msg: 'Profile image uploaded successfully', image_url: imagePath }
 
 ## 제품 이미지 업로드
 http://localhost:3000/api/user/upload_product_image
 method: POST
--H "Authorization: Bearer 토큰"
-=>
+-H "Authorization: Bearer 토큰" -F "image=@이미지 경로"
+=> {"msg":"Product image uploaded successfully"}
 
 
 # DB
