@@ -127,7 +127,7 @@ exports.uploadProductImage = (req, res) => {
   
 
 
-  db.query(sql, [user_id, ], (err) => {
+  db.query(sql, [user_id, food_name, calories, protien, fat, carbohydrate, sugar, sodium, cholestrol, saturated_fat, trans_fat, food_weight, product_image, nutrient_image], (err) => {
     if(err) {
       return res.status(500).json({ msg: 'Failed to upload profile image', err });
     }
