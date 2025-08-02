@@ -27,7 +27,17 @@ exports.register = async (req, res) => {
             db.query(sql2, [user_id, age, height, weight, sex, preg, dis], (err2) => {
                 if (err2) return res.status(500).json({ msg: 'Failed to create user info', err2 });
 
-                return res.status(201).json({ msg: 'User registered successfully' });
+                // JWT Token 생성
+                const token = jwt.sign(
+                  { id: user_id, name: user_name },
+                  process.env.JWT_SECRET,
+                  { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
+                );
+
+                return res.status(201).json({
+                  msg: 'User registered successfully',
+                  token
+                });
             });
         });
     } catch (err) {
