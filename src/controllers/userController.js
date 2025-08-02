@@ -6,6 +6,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const verifyToken = require('../middleware/auth');
+const gemini = require('../utils/gemini');
 
 // Register user
 exports.register = async (req, res) => {
@@ -106,16 +107,26 @@ exports.uploadProfileImage = (req, res) => {
   });
 };
 
-exports.uploadNutrientsImage = (req, res) => {
+exports.uploadNutrientsImage = async (req, res) => {
+  let geminiResult = "error";
+
+  try {
+    geminiResult = await gemini.analyzeNutrients(req.file.path, "Analyze this food label");
+    // Use geminiResult to fill in nutrition info
+  } catch (err) {
+    console.error('Gemini API error:', err);
+    return res.status(500).json({ msg: 'Gemini API error', err });
+  }
+
   const user_id = req.user.id; // JWT에서 추출한 user ID
   const food_name = "제로콜라";
   const calories = 0;
-  const protien = 0;
+  const protein = 0;
   const fat = 0;
   const carbohydrate = 0;
   const sugar = 0;
   const sodium = 0;
-  const cholestrol = 0;
+  const cholesterol = 0;
   const saturated_fat = 0;
   const trans_fat = 0;
   const food_weight = 0; // Assuming this is a placeholder value
@@ -123,15 +134,15 @@ exports.uploadNutrientsImage = (req, res) => {
   const nutrient_image = `uploads/nutrient_images/placeholder.png`; // Placeholder for nutrient image
 
 
-  const sql = 'INSERT INTO eating_history (user_id, eating_time, food_name, calories, protien, fat, carbohydrate, sugar, sodium, cholestrol, saturated_fat, trans_fat, food_weight, product_image, nutrient_image) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+  const sql = 'INSERT INTO eating_history (user_id, eating_time, food_name, calories, protein, fat, carbohydrate, sugar, sodium, cholesterol, saturated_fat, trans_fat, food_weight, product_image, nutrient_image) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
   
 
 
-  db.query(sql, [user_id, food_name, calories, protien, fat, carbohydrate, sugar, sodium, cholestrol, saturated_fat, trans_fat, food_weight, product_image, nutrient_image], (err) => {
+  db.query(sql, [user_id, food_name, calories, protein, fat, carbohydrate, sugar, sodium, cholesterol, saturated_fat, trans_fat, food_weight, product_image, nutrient_image], (err) => {
     if(err) {
       return res.status(500).json({ msg: 'Failed to upload profile image', err });
     }
-    res.json({ msg: 'Product image uploaded successfully' });
+    res.json({ msg: 'Product image uploaded successfully', analyzeResult: geminiResult });
   });
 };
 

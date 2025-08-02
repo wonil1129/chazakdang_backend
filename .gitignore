@@ -4,4 +4,8 @@ cert/*
 !cert/.gitkeep
 uploads/profile_images/*
 !uploads/profile_images/.gitkeep
+uploads/nutrients_images/*
+!uploads/nutrients_images/.gitkeep
+uploads/product_images/*
+!uploads/product_images/.gitkeep
 restart.sh
