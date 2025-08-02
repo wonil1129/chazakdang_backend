@@ -8,8 +8,10 @@ const upload = require('../middleware/upload');
 router.post('/register', userController.register);
 router.post('/login', userController.login);
 router.post('/upload_profile_image', verifyToken, upload.single('image'), userController.uploadProfileImage);
+router.post('/user/delete_account', verifyToken, userController.deleteAccount);
 
 // protected routes
 router.get('/profile', verifyToken, userController.getProfile);
+router.get('/profile/detail', verifyToken, userController.getDetailedProfile);
 
 module.exports = router;

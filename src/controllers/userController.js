@@ -95,3 +95,57 @@ exports.uploadProfileImage = (req, res) => {
     res.json({ msg: 'Profile image uploaded successfully', image_url: imagePath });
   });
 };
+
+
+// Get detailed user info for calendar
+exports.getDetailedProfile = (req, res) => {
+  const userId = req.user.id;
+  const sql = `
+    SELECT u.user_id, u.user_name, ui.age, ui.height, ui.weight, ui.sex, ui.preg, ui.dis
+    FROM user u
+    JOIN user_info ui ON u.user_id = ui.user_id
+    WHERE u.user_id = ?
+  `;
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) return res.status(500).json({ msg: 'Database error', err });
+    if (results.length === 0) return res.status(404).json({ msg: 'User not found' });
+
+    const user = results[0];
+    res.json({
+      id: user.user_id,
+      name: user.user_name,
+      age: user.age,
+      height: user.height,
+      weight: user.weight,
+      sex: user.sex,
+      preg: user.preg,
+      dis: user.dis,
+    });
+  });
+};
+
+exports.deleteAccount = (req, res) => {
+  const userId = req.user.id;
+
+  const deleteHistory = 'DELETE FROM eating_history WHERE user_id = ?';
+  const deleteInfo = 'DELETE FROM user_info WHERE user_id = ?';
+  const deleteUser = 'DELETE FROM user WHERE user_id = ?';
+
+  // 1. 섭취 이력 삭제
+  db.query(deleteHistory, [userId], (err1) => {
+    if (err1) return res.status(500).json({ msg: 'Failed to delete eating history', err1 });
+
+    // 2. 신체 정보 삭제
+    db.query(deleteInfo, [userId], (err2) => {
+      if (err2) return res.status(500).json({ msg: 'Failed to delete user info', err2 });
+
+      // 3. 유저 정보 삭제
+      db.query(deleteUser, [userId], (err3) => {
+        if (err3) return res.status(500).json({ msg: 'Failed to delete user', err3 });
+
+        res.json({ msg: '회원 탈퇴가 완료되었습니다.' });
+      });
+    });
+  });
+};
