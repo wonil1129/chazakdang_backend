@@ -141,7 +141,7 @@ exports.getDetailedProfile = (req, res) => {
   console.log('Fetching detailed profile for user:', req.user.id);
   const userId = req.user.id;
   const sql = `
-    SELECT u.user_id, u.user_name, ui.age, ui.height, ui.weight, ui.sex, ui.preg, ui.dis
+    SELECT u.user_id, u.user_name, u.profile_image, u.registration_date, ui.age, ui.height, ui.weight, ui.sex, ui.preg, ui.dis
     FROM user u
     JOIN user_info ui ON u.user_id = ui.user_id
     WHERE u.user_id = ?
@@ -155,6 +155,8 @@ exports.getDetailedProfile = (req, res) => {
     res.json({
       id: user.user_id,
       name: user.user_name,
+      profile_image: user.profile_image,
+      registration_date: user.registration_date,
       age: user.age,
       height: user.height,
       weight: user.weight,
