@@ -4,3 +4,4 @@ cert/*
 !cert/.gitkeep
 uploads/profile_images/*
 !uploads/profile_images/.gitkeep
+restart.sh
