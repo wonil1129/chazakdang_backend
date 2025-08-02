@@ -75,19 +75,21 @@ dis varchar(200)
 
 ## eating_history
 
-user_id varchar(50) primary key,
-eating_time datetime not null,
-food_name varchar(30),
-calories float not null,
-protien float not null,
-fat float not null,
-carbohydrate float not null,
-sugar float not null,
-sodium float not null,
-cholestrol float not null,
-saturated_fat float not null,
-trans_fat float not null,
-food_weight varchar(50)
+user_id varchar(50) PRIMARY KEY,
+eating_time DATETIME NOT NULL,
+food_name VARCHAR(30),
+calories FLOAT NOT NULL,
+protien FLOAT NOT NULL,
+fat FLOAT NOT NULL,
+carbohydrate FLOAT NOT NULL,
+sugar FLOAT NOT NULL,
+sodium FLOAT NOT NULL,
+cholestrol FLOAT NOT NULL,
+saturated_fat FLOAT NOT NULL,
+trans_fat FLOAT NOT NULL,
+food_weight varchar(50),
+product_image varchar(255),
+nutrient_image VARCHAR(255) NOT NULL
 
 
 
