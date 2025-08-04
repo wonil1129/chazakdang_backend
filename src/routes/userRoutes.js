@@ -10,9 +10,13 @@ router.post('/login', userController.login);
 router.post('/upload_profile_image', verifyToken, upload.single('image'), userController.uploadProfileImage);
 router.post('/upload_nutrients_image', verifyToken, upload.single('image'), userController.uploadNutrientsImage);
 router.post('/delete_account', verifyToken, userController.deleteAccount);
+router.post('/check_id', userController.checkDuplicateId);
+
 
 // protected routes
 router.get('/profile', verifyToken, userController.getProfile);
 router.get('/profile/detail', verifyToken, userController.getDetailedProfile);
+router.get('/calendar/history', verifyToken, userController.getEatingHistoryByDate);
+
 
 module.exports = router;

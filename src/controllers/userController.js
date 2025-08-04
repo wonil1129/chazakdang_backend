@@ -46,6 +46,20 @@ exports.register = async (req, res) => {
     }
 };
 
+// check duplicate ID
+exports.checkDuplicateId = (req, res) => {
+  const { user_id } = req.body;
+  if (!user_id) return res.status(400).json({ msg: 'user_id is required' });
+
+  const sql = 'SELECT user_id FROM user WHERE user_id = ?';
+  db.query(sql, [user_id], (err, results) => {
+    if (err) return res.status(500).json({ msg: 'Database error', err });
+    if (results.length > 0) return res.status(409).json({ msg: 'ID already exists' });
+    return res.json({ msg: 'ID is available' });
+  });
+};
+
+
 // Login user
 exports.login = async (req, res) => {
   const { user_id, user_pw } = req.body;
@@ -178,6 +192,26 @@ exports.getDetailedProfile = (req, res) => {
   });
 };
 
+// 특정 날짜의 섭취 기록 조회
+exports.getEatingHistoryByDate = (req, res) => {
+  const userId = req.user.id;
+  const { date } = req.query; // YYYY-MM-DD 형태로 프론트에서 넘김
+
+  if (!date) return res.status(400).json({ msg: 'Date is required' });
+
+  const sql = `
+    SELECT eating_time, food_name, calories, protein, fat, carbohydrate, sugar, sodium
+    FROM eating_history
+    WHERE user_id = ? AND DATE(eating_time) = ?
+    ORDER BY eating_time ASC
+  `;
+
+  db.query(sql, [userId, date], (err, results) => {
+    if (err) return res.status(500).json({ msg: 'DB error', err });
+    res.json({ date, records: results });
+  });
+};
+
 exports.deleteAccount = (req, res) => {
   console.log('Deleting account for user:', req.user.id);
   const userId = req.user.id;
@@ -185,6 +219,6 @@ exports.deleteAccount = (req, res) => {
 
   db.query(sql, [userId], (err) => {
     if (err) return res.status(500).json({ msg: 'Failed to delete eating history', err });
-    res.json({ msg: 'Account deleted successfully' });
+    res.json({ msg: 'Account deleted successfully. Please logout now.' });
   })
 };
