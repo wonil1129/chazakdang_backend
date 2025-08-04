@@ -222,3 +222,31 @@ exports.deleteAccount = (req, res) => {
     res.json({ msg: 'Account deleted successfully. Please logout now.' });
   })
 };
+
+exports.updateUserInfo = (req, res) => {
+  const userId = req.user.id;
+  const { user_name, age, height, weight, dis } = req.body;
+
+  if (!user_name || !age || !height || !weight) {
+    return res.status(400).json({ msg: 'All fields except disease are required' });
+  }
+
+  const updateUserSql = `UPDATE user SET user_name = ? WHERE user_id = ?`;
+  const updateInfoSql = `
+    UPDATE user_info 
+    SET age = ?, height = ?, weight = ?, dis = ? 
+    WHERE user_id = ?
+  `;
+
+  // user_name 먼저 업데이트
+  db.query(updateUserSql, [user_name, userId], (err1) => {
+    if (err1) return res.status(500).json({ msg: 'Failed to update name', err: err1 });
+
+    // user_info 업데이트
+    db.query(updateInfoSql, [age, height, weight, dis, userId], (err2) => {
+      if (err2) return res.status(500).json({ msg: 'Failed to update user info', err: err2 });
+
+      res.json({ msg: 'User information updated successfully' });
+    });
+  });
+};
