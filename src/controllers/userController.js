@@ -248,11 +248,11 @@ exports.updateUserInfo = (req, res) => {
     WHERE user_id = ?
   `;
 
-  // user_name 먼저 업데이트
+  // user_name update
   db.query(updateUserSql, [user_name, userId], (err1) => {
     if (err1) return res.status(500).json({ msg: 'Failed to update name', err: err1 });
 
-    // user_info 업데이트
+    // user_info update
     db.query(updateInfoSql, [age, height, weight, sex, preg, dis, userId], (err2) => {
       if (err2) return res.status(500).json({ msg: 'Failed to update user info', err: err2 });
 
