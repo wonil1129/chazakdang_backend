@@ -103,7 +103,7 @@ create table eating_history(
     carbohydrate FLOAT NOT NULL,
     sugar FLOAT NOT NULL,
     sodium FLOAT NOT NULL,
-    cholestrol FLOAT NOT NULL,
+    cholesterol FLOAT NOT NULL,
     saturated_fat FLOAT NOT NULL,
     trans_fat FLOAT NOT NULL,
     food_weight varchar(50),
