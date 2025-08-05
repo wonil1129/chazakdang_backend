@@ -218,23 +218,23 @@ exports.deleteAccount = (req, res) => {
   const sql = 'DELETE FROM user WHERE user_id = ?';
 
   db.query(sql, [userId], (err) => {
-    if (err) return res.status(500).json({ msg: 'Failed to delete eating history', err });
+    if (err) return res.status(500).json({ msg: 'Failed to delete account', err });
     res.json({ msg: 'Account deleted successfully. Please logout now.' });
   })
 };
 
 exports.updateUserInfo = (req, res) => {
   const userId = req.user.id;
-  const { user_name, age, height, weight, dis } = req.body;
+  const { user_name, age, height, weight, sex, preg, dis } = req.body;
 
-  if (!user_name || !age || !height || !weight) {
+  if (!user_name || !age || !height || !weight || !sex || !preg) {
     return res.status(400).json({ msg: 'All fields except disease are required' });
   }
 
   const updateUserSql = `UPDATE user SET user_name = ? WHERE user_id = ?`;
   const updateInfoSql = `
     UPDATE user_info 
-    SET age = ?, height = ?, weight = ?, dis = ? 
+    SET age = ?, height = ?, weight = ?, sex = ?, preg = ?, dis = ? 
     WHERE user_id = ?
   `;
 
@@ -243,7 +243,7 @@ exports.updateUserInfo = (req, res) => {
     if (err1) return res.status(500).json({ msg: 'Failed to update name', err: err1 });
 
     // user_info 업데이트
-    db.query(updateInfoSql, [age, height, weight, dis, userId], (err2) => {
+    db.query(updateInfoSql, [age, height, weight, sex, preg, dis, userId], (err2) => {
       if (err2) return res.status(500).json({ msg: 'Failed to update user info', err: err2 });
 
       res.json({ msg: 'User information updated successfully' });
