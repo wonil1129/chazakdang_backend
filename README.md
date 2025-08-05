@@ -92,9 +92,9 @@ CREATE TABLE user_info(
 
 ## eating_history
 
-create table eating_history(
+CREATE TABLE eating_history (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    user_id varchar(50) NOT NULL,
+    user_id VARCHAR(50) NOT NULL,
     eating_time DATETIME NOT NULL DEFAULT NOW(),
     food_name VARCHAR(30),
     calories FLOAT NOT NULL,
@@ -106,14 +106,15 @@ create table eating_history(
     cholesterol FLOAT NOT NULL,
     saturated_fat FLOAT NOT NULL,
     trans_fat FLOAT NOT NULL,
-    food_weight varchar(50),
-    product_image varchar(255),
+    food_weight VARCHAR(50),
+    product_image VARCHAR(255),
     nutrient_image VARCHAR(255) NOT NULL,
-    nutrient_list VARCHAR(255),
+    nutrient_list TEXT,
     rating TINYINT UNSIGNED,
     review_text TEXT,
-    foreign key (user_id) references user(user_id) on delete cascade
+    FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
+
 
 
 
