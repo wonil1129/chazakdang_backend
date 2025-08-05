@@ -125,7 +125,14 @@ exports.uploadNutrientsImage = async (req, res) => {
   let geminiResult = "error";
 
   try {
-    geminiResult = await gemini.analyzeNutrients(req.file.path, "Analyze this food label");
+    geminiResult = await gemini.analyzeNutrients(req.file.path, "user has no disease");
+
+    if(typeof geminiResult === 'string') {
+      console.log('Gemini API returned string, parsing as JSON');
+      geminiResult = JSON.parse(geminiResult);
+    }
+
+    
     // Use geminiResult to fill in nutrition info
   } catch (err) {
     console.error('Gemini API error:', err);
@@ -133,26 +140,29 @@ exports.uploadNutrientsImage = async (req, res) => {
   }
 
   const user_id = req.user.id; // JWT에서 추출한 user ID
-  const food_name = "제로콜라";
-  const calories = 0;
-  const protein = 0;
-  const fat = 0;
-  const carbohydrate = 0;
-  const sugar = 0;
-  const sodium = 0;
-  const cholesterol = 0;
-  const saturated_fat = 0;
-  const trans_fat = 0;
-  const food_weight = 0; // Assuming this is a placeholder value
+  const food_name = geminiResult.food_name || '알 수 없음';
+  const calories = geminiResult.calories || 0;
+  const protein = geminiResult.protein || 0;
+  const fat = geminiResult.fat || 0;
+  const carbohydrate = geminiResult.carbohydrate || 0;
+  const sugar = geminiResult.sugar || 0;
+  const sodium = geminiResult.sodium || 0;
+  const cholesterol = geminiResult.cholesterol || 0;
+  const saturated_fat = geminiResult.saturated_fat || 0;
+  const trans_fat = geminiResult.trans_fat || 0;
+  const food_weight = geminiResult.food_weight || '0g';
+  const nutrient_list = geminiResult.ingredients || '';
+  const rating = geminiResult.rating || 1; // Default to 1 if not provided
+  const review_text = geminiResult.review_text || '리뷰 없음';
   const product_image = `uploads/product_images/${req.file.filename}`;
   const nutrient_image = `uploads/nutrient_images/placeholder.png`; // Placeholder for nutrient image
 
 
-  const sql = 'INSERT INTO eating_history (user_id, eating_time, food_name, calories, protein, fat, carbohydrate, sugar, sodium, cholesterol, saturated_fat, trans_fat, food_weight, product_image, nutrient_image) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+  const sql = 'INSERT INTO eating_history (user_id, eating_time, food_name, calories, protein, fat, carbohydrate, sugar, sodium, cholesterol, saturated_fat, trans_fat, food_weight, product_image, nutrient_image, nutrient_list, rating, review_text) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
   
 
 
-  db.query(sql, [user_id, food_name, calories, protein, fat, carbohydrate, sugar, sodium, cholesterol, saturated_fat, trans_fat, food_weight, product_image, nutrient_image], (err) => {
+  db.query(sql, [user_id, food_name, calories, protein, fat, carbohydrate, sugar, sodium, cholesterol, saturated_fat, trans_fat, food_weight, product_image, nutrient_image, nutrient_list, rating, review_text], (err) => {
     if(err) {
       return res.status(500).json({ msg: 'Failed to upload profile image', err });
     }
