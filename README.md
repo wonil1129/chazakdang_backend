@@ -98,7 +98,7 @@ create table eating_history(
     eating_time DATETIME NOT NULL DEFAULT NOW(),
     food_name VARCHAR(30),
     calories FLOAT NOT NULL,
-    protien FLOAT NOT NULL,
+    protein FLOAT NOT NULL,
     fat FLOAT NOT NULL,
     carbohydrate FLOAT NOT NULL,
     sugar FLOAT NOT NULL,
