@@ -65,44 +65,55 @@ method: PUT
 # DB
 
 ## user
-user_id varchar(50) primary key, 
-user_pw varchar(200) not null,
-user_name varchar(50) NOT NULL,
-profile_image varchar(255),
-registration_date DATETIME NOT NULL
+
+CREATE TABLE user(
+    user_id varchar(50) primary key, 
+    user_pw varchar(200) not null,
+    user_name varchar(50) NOT NULL,
+    profile_image varchar(255),
+    registration_date DATETIME NOT NULL
+    );
 
 ## user_info
 
-user_id VARCHAR(50),
-age int not null,
-height int not null,
-weight int not null,
-sex boolean not null,
-preg boolean,
-dis varchar(200)
+CREATE TABLE user_info(
+    user_id VARCHAR(50),
+    age int not null,
+    height int not null,
+    weight int not null,
+    sex boolean not null,
+    preg boolean,
+    dis varchar(200),
+    PRIMARY KEY (user_id),
+    FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
+);
 
 -# 성별 논리값 {남 : 1, 여 : 0}
 
 ## eating_history
 
-user_id varchar(50) PRIMARY KEY,
-eating_time DATETIME NOT NULL,
-food_name VARCHAR(30),
-calories FLOAT NOT NULL,
-protien FLOAT NOT NULL,
-fat FLOAT NOT NULL,
-carbohydrate FLOAT NOT NULL,
-sugar FLOAT NOT NULL,
-sodium FLOAT NOT NULL,
-cholestrol FLOAT NOT NULL,
-saturated_fat FLOAT NOT NULL,
-trans_fat FLOAT NOT NULL,
-food_weight varchar(50),
-product_image varchar(255),
-nutrient_image VARCHAR(255) NOT NULL
-nutrient_list VARCHAR(255) NOT NULL
-rating TINYINT UNSIGNED
-review_text TEXT
+create table eating_history(
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id varchar(50) NOT NULL,
+    eating_time DATETIME NOT NULL DEFAULT NOW(),
+    food_name VARCHAR(30),
+    calories FLOAT NOT NULL,
+    protien FLOAT NOT NULL,
+    fat FLOAT NOT NULL,
+    carbohydrate FLOAT NOT NULL,
+    sugar FLOAT NOT NULL,
+    sodium FLOAT NOT NULL,
+    cholestrol FLOAT NOT NULL,
+    saturated_fat FLOAT NOT NULL,
+    trans_fat FLOAT NOT NULL,
+    food_weight varchar(50),
+    product_image varchar(255),
+    nutrient_image VARCHAR(255) NOT NULL,
+    nutrient_list VARCHAR(255),
+    rating TINYINT UNSIGNED,
+    review_text TEXT,
+    foreign key (user_id) references user(user_id) on delete cascade
+);
 
 
 
