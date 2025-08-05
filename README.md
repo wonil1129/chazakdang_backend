@@ -54,7 +54,7 @@ method: POST
 ## 중복 ID 확인
 http://localhost:3000/api/user/check_id
 method: POST
-{user_id: 'user_id'}
+-H "Content-Type: application/json" -d '{"user_id": "user_id"}'
 => {"msg":"ID is available"}
 
 ## 회원 정보 수정
