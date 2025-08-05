@@ -9,7 +9,7 @@ method: POST
 ## REGISTER
 http://localhost:3000/api/user/register
 method: POST
-{"user_id":"userid","user_pw":"userpw","user_name":"username"}
+-H "Content-Type: application/json" -d '{"user_id":"아이디","user_pw":"비밀번호","user_name":"이름", "age":"나이", "height":"키","weight":"몸무게","sex":"0 또는 1","preg":"0 또는 1","dis":"텍스트"}'
 => {"msg":"User registered successfully","token":"토큰"}
 
 ## 회원탈퇴
@@ -51,6 +51,16 @@ method: POST
 -H "Authorization: Bearer 토큰" -F "image=@이미지 경로"
 => {"msg":"Product image uploaded successfully"}
 
+## 중복 ID 확인
+http://localhost:3000/api/user/check_id
+method: POST
+{user_id: 'user_id'}
+=> {"msg":"ID is available"}
+
+## 회원 정보 수정
+http://localhost:3000/api/user/update_info
+method: PUT
+-H "Authorization: Bearer 토큰" -d '{"user_id":"아이디","user_pw":"비밀번호","user_name":"이름", "age":"나이", "height":"키","weight":"몸무게","sex":"0 또는 1","preg":"0 또는 1","dis":"텍스트"}'
 
 # DB
 
