@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const verifyToken = require('../middleware/auth');
 const gemini = require('../utils/gemini');
+const userService = require('../services/userService');
 
 // Register user
 exports.register = async (req, res) => {
@@ -123,23 +124,22 @@ exports.uploadProfileImage = (req, res) => {
 
 exports.uploadNutrientsImage = async (req, res) => {
   let geminiResult = "error";
+  let userInfo;
 
   try {
-    geminiResult = await gemini.analyzeNutrients(req.file.path, "user has no disease");
+    userInfo = await userService.getUserDetailedInfo(req.user.id);
+    geminiResult = await gemini.analyzeNutrients(req.file.path, userInfo);
 
     if(typeof geminiResult === 'string') {
       console.log('Gemini API returned string, parsing as JSON');
       geminiResult = JSON.parse(geminiResult);
     }
-
-    
-    // Use geminiResult to fill in nutrition info
   } catch (err) {
     console.error('Gemini API error:', err);
     return res.status(500).json({ msg: 'Gemini API error', err });
   }
 
-  const user_id = req.user.id; // JWT에서 추출한 user ID
+  const user_id = req.user.id;
   const food_name = geminiResult.food_name || '알 수 없음';
   const calories = geminiResult.calories || 0;
   const protein = geminiResult.protein || 0;
