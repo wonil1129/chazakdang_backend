@@ -100,7 +100,7 @@ trans_fat FLOAT NOT NULL,
 food_weight varchar(50),
 product_image varchar(255),
 nutrient_image VARCHAR(255) NOT NULL
-nutrient_list VARCHAR(200) NOT NULL
+nutrient_list VARCHAR(255) NOT NULL
 rating TINYINT UNSIGNED
 review_text TEXT
 
