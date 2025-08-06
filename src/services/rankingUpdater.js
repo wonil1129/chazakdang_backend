@@ -19,7 +19,7 @@ async function updateDailyRanking() {
                 CURDATE()
             FROM user a
             JOIN eating_history b ON a.user_id = b.user_id
-            WHERE DATE(b.eat_time) = CURDATE()
+            WHERE DATE(b.eating_time) = CURDATE()
             GROUP BY a.user_id
             ORDER BY daily_score DESC
             LIMIT 10
@@ -53,7 +53,7 @@ async function updateWeeklyRanking() {
                 CURDATE()
             FROM user a
             JOIN eating_history b ON a.user_id = b.user_id
-            WHERE YEARWEEK(b.eat_time, 0) = YEARWEEK(CURDATE(), 0)
+            WHERE YEARWEEK(b.eating_time, 0) = YEARWEEK(CURDATE(), 0)
             GROUP BY a.user_id
             ORDER BY weekly_score DESC
             LIMIT 10
@@ -87,7 +87,7 @@ async function updateMonthlyRanking() {
                 CURDATE() 
             FROM user a
             JOIN eating_history b ON a.user_id = b.user_id
-            WHERE MONTH(b.eat_time) = MONTH(CURDATE())
+            WHERE MONTH(b.eating_time) = MONTH(CURDATE())
             AND YEAR(b.eat_time) = YEAR(CURDATE())
             GROUP BY a.user_id
             ORDER BY monthly_score DESC
