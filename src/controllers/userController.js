@@ -8,6 +8,9 @@ const jwt = require('jsonwebtoken');
 const verifyToken = require('../middleware/auth');
 const gemini = require('../utils/gemini');
 const userService = require('../services/userService');
+const crawlCoupang = require('../utils/crawlCoupang');
+const downloadImage = require('../utils/downloadImage');
+const path = require('path');
 
 // Register user
 exports.register = async (req, res) => {
@@ -154,8 +157,24 @@ exports.uploadNutrientsImage = async (req, res) => {
   const nutrient_list = geminiResult.ingredients || '';
   const rating = geminiResult.rating || 1; // Default to 1 if not provided
   const review_text = geminiResult.review_text || '리뷰 없음';
-  const product_image = `uploads/product_images/${req.file.filename}`;
-  const nutrient_image = `uploads/nutrient_images/placeholder.png`; // Placeholder for nutrient image
+  let product_image = `uploads/product_images/placeholder.jpg`; // Placeholder for product image
+  const nutrient_image = `uploads/nutrient_images/${req.file.filename}`;
+
+  let coupangResult = null;
+  try {
+    coupangResult = await crawlCoupang(food_name);
+    console.log('Coupang result:', coupangResult);
+    if (coupangResult) {
+      const imageFilename = await downloadImage(coupangResult, path.join(__dirname, '../../uploads/product_images'));
+      product_image = `uploads/product_images/${imageFilename}`;
+      console.log('imagePath:', product_image);
+    }
+  } catch (err) {
+    console.error('Coupang crawling or image download error:', err);
+  }
+
+  console.log('Coupang result:', coupangResult);
+  console.log('imagePath:', product_image);
 
 
   const sql = 'INSERT INTO eating_history (user_id, eating_time, food_name, calories, protein, fat, carbohydrate, sugar, sodium, cholesterol, saturated_fat, trans_fat, food_weight, product_image, nutrient_image, nutrient_list, rating, review_text) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
@@ -164,9 +183,13 @@ exports.uploadNutrientsImage = async (req, res) => {
 
   db.query(sql, [user_id, food_name, calories, protein, fat, carbohydrate, sugar, sodium, cholesterol, saturated_fat, trans_fat, food_weight, product_image, nutrient_image, nutrient_list, rating, review_text], (err) => {
     if(err) {
-      return res.status(500).json({ msg: 'Failed to upload profile image', err });
+      return res.status(500).json({ msg: 'Failed to upload nutrients image', err });
     }
-    res.json({ msg: 'Product image uploaded successfully', analyzeResult: geminiResult });
+    res.json({
+      msg: 'Product image uploaded successfully',
+      analyzeResult: geminiResult,
+    coupang: coupangResult || { msg: 'No Coupang result' }
+    });
   });
 };
 
