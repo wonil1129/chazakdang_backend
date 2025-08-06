@@ -11,6 +11,8 @@ app.use(express.json());
 app.use('/api/user', userRoutes);
 app.use('/api/ranking', rankingRoutes);
 
+require('./src//utils/scheduler'); // 스케줄러 미들웨어
+
 const sslOptions = {
   key: fs.readFileSync('./cert/server.key'),
   cert: fs.readFileSync('./cert/server.cert')
