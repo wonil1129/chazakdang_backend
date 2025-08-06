@@ -115,6 +115,16 @@ CREATE TABLE eating_history (
     FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
 
+CREATE TABLE ranking_log (
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, -- 자동 증가 기본키
+    user_id VARCHAR(50) NOT NULL, -- 사용자 ID
+    ranking_type ENUM('daily', 'weekly', 'monthly') NOT NULL, -- 랭킹 종류
+    score FLOAT NOT NULL, -- 해당 시점의 평균 건강 점수
+    rank_date DATE NOT NULL, -- 점수가 집계된 날짜
+    FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
+);
+
+
 
 
 
