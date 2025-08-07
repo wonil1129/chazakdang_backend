@@ -6,7 +6,7 @@ async function hashPassword(password) {
 }
 
 async function verifyPassword(password, hashedPassword) {
-    return await bcrypt.compare(password, hashPassword);
+    return await bcrypt.compare(password, hashedPassword);
 }
 
 module.exports = {hashPassword, verifyPassword};

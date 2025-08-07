@@ -10,6 +10,10 @@ const rankingRoutes = require('./src/routes/rankingRoutes');
 app.use(express.json());
 app.use('/api/user', userRoutes);
 app.use('/api/ranking', rankingRoutes);
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Internal Server Error' });
+});
 
 require('./src//utils/scheduler'); // 스케줄러 미들웨어
 

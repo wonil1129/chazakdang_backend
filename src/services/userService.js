@@ -16,3 +16,141 @@ exports.getUserDetailedInfo = (userId) => {
         });
     });
 };
+
+exports.createUser = (user_id, hashedPw, user_name) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO user (user_id, user_pw, user_name, registration_date) VALUES (?, ?, ?, NOW())';
+
+        db.query(sql, [user_id, hashedPw, user_name], (err, result) => {
+            if (err) return reject(err);
+            resolve(result)
+        });
+    });
+};
+
+exports.deleteUser = (user_id) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM user WHERE user_id = ?';
+
+        db.query(sql, [user_id], (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+        });
+    })
+};
+
+exports.createUserInfo = (user_id, age, height, weight, sex, preg, dis) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO user_info (user_id, age, height, weight, sex, preg, dis) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        db.query(sql, [user_id, age, height, weight, sex, preg, dis], (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+        });
+    });
+};
+
+exports.getUserById = (user_id) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM user WHERE user_id = ?';
+        db.query(sql, [user_id], (err, results) => {
+            if (err) return reject(err);
+            resolve(results[0] || null);
+        });
+    });
+};
+
+exports.checkDuplicateId = (user_id) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT 1 FROM user WHERE user_id = ? LIMIT 1';
+        db.query(sql, [user_id], (err, results) => {
+            if (err) return reject(err);
+            resolve(results.length > 0);
+        });
+    });
+};
+
+exports.getEatingHistoryByIdAndDate = (user_id, date) => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+          SELECT eating_time, food_name, calories, protein, fat, carbohydrate, sugar, sodium
+          FROM eating_history
+          WHERE user_id = ? AND DATE(eating_time) = ?
+          ORDER BY eating_time ASC
+        `;
+        db.query(sql, [user_id, date], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+        })
+    })
+};
+
+exports.updateUserName = (user_id, user_name) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'UPDATE user SET user_name = ? WHERE user_id = ?';
+        db.query(sql, [user_name, user_id], (err, result) => {
+            if (err) return reject(err);
+            resolve(result.affectedRows > 0);
+        });
+    });
+};
+
+exports.updateUserInfo = (user_id, age, height, weight, sex, preg, dis ) => {
+    return new Promise((resolve, reject) => {
+          const sql = `
+            UPDATE user_info 
+            SET age = ?, height = ?, weight = ?, sex = ?, preg = ?, dis = ? 
+            WHERE user_id = ?
+            `;
+          db.query(sql, [age, height, weight, sex, preg, dis, user_id], (err, result) => {
+            if (err) return reject(err);
+            if (result.affectedRows === 0) return reject(new Error('User info not found'));
+            resolve(result.affectedRows > 0);
+          })
+    })
+};
+
+exports.updateProfileImage = (user_id, profile_image) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'UPDATE user SET profile_image = ? WHERE user_id = ?';
+        db.query(sql, [profile_image, user_id], (err, result) => {
+            if (err) return reject(err);
+            resolve(result.affectedRows > 0);
+        });
+    });
+};
+
+exports.insertEatingHistory = (user_id, data) => {
+    const sql = `
+    INSERT INTO eating_history (
+      user_id, eating_time, food_name, calories, protein, fat,
+      carbohydrate, sugar, sodium, cholesterol, saturated_fat,
+      trans_fat, food_weight, product_image, nutrient_image,
+      nutrient_list, rating, review_text
+    ) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+    const values = [
+      user_id,
+      data.food_name,
+      data.calories,
+      data.protein,
+      data.fat,
+      data.carbohydrate,
+      data.sugar,
+      data.sodium,
+      data.cholesterol,
+      data.saturated_fat,
+      data.trans_fat,
+      data.food_weight,
+      data.product_image,
+      data.nutrient_image,
+      data.nutrient_list,
+      data.rating,
+      data.review_text,
+    ];
+    return new Promise((resolve, reject) => {
+        db.query(sql, values, (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+        })
+    })
+};

@@ -14,4 +14,12 @@ const verifyToken = (req, res, next) => {
     });
 }
 
-module.exports = verifyToken;
+const createToken = (user_id, user_name) => {
+  return jwt.sign(
+    { id: user_id, name: user_name },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
+  );
+};
+
+module.exports = {verifyToken, createToken};
