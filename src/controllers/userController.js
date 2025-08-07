@@ -7,6 +7,7 @@ const productService = require('../services/productService');
 const path = require('path');
 // const { createToken } = require('../middleware/auth');
 const auth = require('../middleware/auth');
+import db from '../../config/db';
 
 exports.checkDuplicateId = async (req, res) => {
   const user_id = req.body.user_id;
@@ -37,10 +38,10 @@ exports.register = async (req, res) => {
 
         const hashedPw = await hashPassword(user_pw);
 
-        // db.beginTransaction();
+        db.beginTransaction();
         await userService.createUser(user_id, hashedPw, user_name);
         await userService.createUserInfo(user_id, age, height, sex, weight, preg, dis);
-        // db.commit();
+        db.commit();
 
         const token = auth.createToken(user_id, user_name);
 
