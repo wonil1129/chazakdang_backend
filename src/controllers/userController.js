@@ -1,14 +1,9 @@
-const db = require('../../config/db');
 const { hashPassword, verifyPassword } = require('../utils/hash');
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const gemini = require('../utils/gemini');
 const userService = require('../services/userService');
 const nutrientService = require('../services/nutrientService');
 const productService = require('../services/productService');
-const crawlCoupang = require('../utils/crawlCoupang');
-const downloadImage = require('../utils/downloadImage');
 const path = require('path');
 // const { createToken } = require('../middleware/auth');
 const auth = require('../middleware/auth');
