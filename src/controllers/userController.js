@@ -7,7 +7,7 @@ const productService = require('../services/productService');
 const path = require('path');
 // const { createToken } = require('../middleware/auth');
 const auth = require('../middleware/auth');
-import db from '../../config/db';
+const db = require('../../config/db');
 
 exports.checkDuplicateId = async (req, res) => {
   const user_id = req.body.user_id;
