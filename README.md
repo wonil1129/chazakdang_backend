@@ -62,6 +62,23 @@ http://localhost:3000/api/user/update_info
 method: PUT
 -H "Authorization: Bearer 토큰" -d '{"user_id":"아이디","user_pw":"비밀번호","user_name":"이름", "age":"나이", "height":"키","weight":"몸무게","sex":"0 또는 1","preg":"0 또는 1","dis":"텍스트"}'
 
+## 일일 랭킹 조회
+http://localhost:3000/api/ranking/dailyRanking
+method: GET
+=> {"rank": "랭킹 순위", "user_name": "이름", "profile_image": "프로필 이미지", "daily_score": "일일 건강 점수"}
+
+## 주간 랭킹 조회
+http://localhost:3000/api/ranking/weeklyRanking
+method: GET
+=> {"rank": "랭킹 순위", "user_name": "이름", "profile_image": "프로필 이미지", "weekly_score": "주간 건강 점수"}
+
+
+## 월간 랭킹 조회
+http://localhost:3000/api/ranking/monthlyRanking
+method: GET
+=> {"rank": "랭킹 순위", "user_name": "이름", "profile_image": "프로필 이미지", "monthly_score": "월간 건강 점수"}
+
+
 # DB
 
 ## user
