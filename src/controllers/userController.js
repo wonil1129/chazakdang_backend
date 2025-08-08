@@ -8,6 +8,7 @@ const path = require('path');
 // const { createToken } = require('../middleware/auth');
 const auth = require('../middleware/auth');
 const db = require('../../config/db');
+const predictionService = require('../services/predictionService');
 
 exports.checkDuplicateId = async (req, res) => {
   const user_id = req.body.user_id;
@@ -109,6 +110,7 @@ exports.uploadProfileImage = async (req, res) => {
 exports.uploadNutrientsImage = async (req, res) => {
   const user_id = req.user.id;
   const nutrient_image = `uploads/nutrient_images/${req.file.filename}`;
+  let prediction = { predicted_value: 'NaN' };
 
   try {
     const userInfo = await userService.getUserDetailedInfo(req.user.id);
@@ -121,10 +123,19 @@ exports.uploadNutrientsImage = async (req, res) => {
       nutrient_image,
     });
 
+    try {
+      console.log('Sending data to Python script for prediction:', nutrientData);
+      prediction = await predictionService.runPrediction(nutrientData);
+    } catch (error) {
+      console.error('Error running prediction:', error);
+      prediction = { predicted_value: 'NaN' };
+    }
+
     res.json({
       msg: 'Nutrients image uploaded successfully',
       analyzeResult: nutrientData,
       coupang: product_image.includes('placeholder') ? { msg: 'No product image found' } : product_image,
+      health_score: prediction.predicted_value || 'NaN',
     });
   } catch (err) {
     console.error('Upload error:', err);

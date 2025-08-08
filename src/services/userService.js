@@ -1,4 +1,5 @@
 const db = require('../../config/db');
+const joi = require('joi');
 
 exports.getUserDetailedInfo = (userId) => {
     return new Promise((resolve, reject) => {
@@ -96,17 +97,41 @@ exports.updateUserName = (user_id, user_name) => {
 
 exports.updateUserInfo = (user_id, age, height, weight, sex, preg, dis ) => {
     return new Promise((resolve, reject) => {
-          const sql = `
-            UPDATE user_info 
-            SET age = ?, height = ?, weight = ?, sex = ?, preg = ?, dis = ? 
-            WHERE user_id = ?
-            `;
-          db.query(sql, [age, height, weight, sex, preg, dis, user_id], (err, result) => {
-            if (err) return reject(err);
-            if (result.affectedRows === 0) return reject(new Error('User info not found'));
-            resolve(result.affectedRows > 0);
-          })
-    })
+        const schema = joi.object({
+            user_id: joi.any().required(),
+            age: joi.number().integer().min(0).max(9999).required(),
+            height: joi.number().min(0).max(9999).required(),
+            weight: joi.number().min(0).max(9999).required(),
+            sex: joi.required(),
+            preg: joi.required(),
+            dis: joi.string().allow(null, ''),
+        });
+
+        const { error } = schema.validate({
+            user_id,
+            age,
+            height,
+            weight,
+            sex,
+            preg,
+            dis,
+        });
+
+        if (error) {
+            return reject(new Error(`Validation error: ${error.message}`));
+        }
+
+        const sql = `
+          UPDATE user_info 
+          SET age = ?, height = ?, weight = ?, sex = ?, preg = ?, dis = ? 
+          WHERE user_id = ?
+          `;
+        db.query(sql, [age, height, weight, sex, preg, dis, user_id], (err, result) => {
+          if (err) return reject(err);
+          if (result.affectedRows === 0) return reject(new Error('User info not found'));
+          resolve(result.affectedRows > 0);
+        });
+    });
 };
 
 exports.updateProfileImage = (user_id, profile_image) => {

@@ -1,0 +1,5 @@
+joblib==1.5.1
+numpy==2.3.2
+nvidia-nccl-cu12==2.27.7
+scipy==1.16.1
+xgboost==3.0.3
