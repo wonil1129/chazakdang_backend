@@ -4,6 +4,10 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
+const groundingTool = {
+  googleSearch: {},
+};
+
 exports.analyzeNutrients = async (imagePath, userInfo) => {
   console.log('Analyzing nutrients for image:', imagePath);
 
@@ -91,6 +95,7 @@ exports.analyzeNutrients = async (imagePath, userInfo) => {
           'ingredients', 'rating', 'review_text',
         ],
       },
+      tools: [groundingTool],
     },
   });
 
