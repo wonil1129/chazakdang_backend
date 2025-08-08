@@ -113,7 +113,7 @@ CREATE TABLE eating_history (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(50) NOT NULL,
     eating_time DATETIME NOT NULL DEFAULT NOW(),
-    food_name VARCHAR(30),
+    food_name VARCHAR(255),
     calories FLOAT NOT NULL,
     protein FLOAT NOT NULL,
     fat FLOAT NOT NULL,
