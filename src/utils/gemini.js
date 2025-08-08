@@ -11,6 +11,8 @@ exports.analyzeNutrients = async (imagePath, userInfo) => {
 
   const prompt = `
 이 이미지는 식품 포장지에 있는 영양 정보 라벨입니다. 아래 정보를 추출하고 사용자 건강 정보를 참고해 분석한 결과를 JSON 형식으로 반환하세요. 출력은 반드시 JSON만 포함해야 합니다.
+이미지에서 정확한 영양 정보를 추출하고, 확실히 알아볼 수 없는 텍스트는 'NaN'으로 표기하세요.
+제조판매원, 
 
 필드:
 - food_name (제품명)
@@ -24,6 +26,7 @@ exports.analyzeNutrients = async (imagePath, userInfo) => {
 - saturated_fat (포화지방, g)
 - trans_fat (트랜스지방, g)
 - food_weight (표기된 총 중량, 예: "84g")
+- ingredients (대체당, 인공 감미료, 쉼표로 구분된 문자열) 대체당 리스트 = [D-말티톨, 소비톨, 에리스리톨, 폴리글리시톨, 수크랄로스, 아세설팜, 아스파탐, 스테비아, 사카린] 이름 뒤에 시럽 또는 액이 붙어도 대체당으로 간주
 - rating (건강에 대한 평점, 1~5 정수로)
 - review_text (이 식품이 사용자에게 미치는 건강 영향 분석, 반드시 한국어로 서술)
 

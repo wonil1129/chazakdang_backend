@@ -8,6 +8,9 @@ const userRoutes = require('./src/routes/userRoutes');
 const rankingRoutes = require('./src/routes/rankingRoutes');
 
 app.use(express.json());
+
+app.use('/uploads', express.static('uploads'));
+
 app.use('/api/user', userRoutes);
 app.use('/api/ranking', rankingRoutes);
 app.use((err, req, res, next) => {
