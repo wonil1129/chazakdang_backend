@@ -41,7 +41,7 @@ exports.register = async (req, res) => {
 
         db.beginTransaction();
         await userService.createUser(user_id, hashedPw, user_name);
-        await userService.createUserInfo(user_id, age, height, sex, weight, preg, dis);
+        await userService.createUserInfo(user_id, age, height, weight, sex, preg, dis);
         db.commit();
 
         const token = auth.createToken(user_id, user_name);
