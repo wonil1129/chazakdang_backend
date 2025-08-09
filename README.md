@@ -115,6 +115,7 @@ CREATE TABLE user_info(
 
 CREATE TABLE eating_history (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    health_score float,
     user_id VARCHAR(50) NOT NULL,
     eating_time DATETIME NOT NULL DEFAULT NOW(),
     food_name VARCHAR(255),
