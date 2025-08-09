@@ -4,25 +4,48 @@ const router = express.Router();
 
 
 exports.dailyRanking = (req, res) => {
-    const sql = `SELECT a.user_name, a.profile_image, b.score AS daily_score
-                FROM user a
-                JOIN ranking_log b ON a.user_id = b.user_id
-                where b.ranking_type = 'daily' and b.rank_date = CURDATE()
-                ORDER BY daily_score DESC, b.user_id ASC
-                LIMIT 10`;
-    db.query(sql, (err, results) => {
-        if(err || results.length == 0) {return res.status(500).json({ msg: '일간 랭킹 조회에 실패했습니다.', err });}
+    const user_id = req.user.id; // assuming user ID comes from auth middleware
 
-        const dailyRanking = results.map((row, index) => ({
-            rank: index + 1,
-            user_name: row.user_name,
-            profile_image: row.profile_image,
-            daily_score: row.daily_score
-        }));
+    const sql = `
+        WITH ranked AS (
+            SELECT
+                a.user_id,
+                a.user_name,
+                a.profile_image,
+                b.score AS daily_score,
+                RANK() OVER (ORDER BY b.score DESC, b.user_id ASC) AS user_rank
+            FROM user a
+            JOIN ranking_log b ON a.user_id = b.user_id
+            WHERE b.ranking_type = 'daily'
+              AND b.rank_date = CURDATE()
+        )
+        SELECT *
+        FROM ranked
+        WHERE user_rank <= 10 OR user_id = ?
+        ORDER BY user_rank
+    `;
 
-        res.json({ dailyRanking });
+    db.query(sql, [user_id], (err, results) => {
+        if (err || results.length === 0) {
+            return res.status(500).json({ msg: '일간 랭킹 조회에 실패했습니다.', err });
+        }
+
+        // Separate top 10 and requesting user's rank
+        const dailyRanking = results
+            .filter(r => r.user_rank <= 10)
+            .map(r => ({
+                rank: r.user_rank,
+                user_name: r.user_name,
+                profile_image: r.profile_image,
+                daily_score: r.daily_score
+            }));
+
+        const userRanking = results.find(r => r.user_id === user_id);
+
+        res.json({ dailyRanking, userRanking });
     });
 };
+
 
 
 exports.weeklyRanking = (req, res) => {
