@@ -109,13 +109,14 @@ exports.uploadProfileImage = async (req, res) => {
 
 exports.uploadNutrientsImage = async (req, res) => {
   const user_id = req.user.id;
-  const nutrient_image = `uploads/nutrient_images/${req.file.filename}`;
+  const nutrient_image = `uploads/nutrients_images/${req.file.filename}`;
   let prediction = { predicted_value: 'NaN' };
 
   try {
     const userInfo = await userService.getUserDetailedInfo(req.user.id);
     const nutrientData = await nutrientService.analyzeNutrients(req.file.path, userInfo);
-    const product_image = await productService.fetchProductImage(nutrientData.food_name) || 'uploads/product_images/placeholder.jpg';
+    // const product_image = await productService.fetchProductImage(nutrientData.food_name) || 'uploads/product_images/placeholder.jpg';
+    const product_image = 'uploads/product_images/placeholder.jpg'; // Placeholder for product image
 
     await userService.insertEatingHistory(user_id, {
       ...nutrientData,
@@ -130,11 +131,14 @@ exports.uploadNutrientsImage = async (req, res) => {
       console.error('Error running prediction:', error);
       prediction = { predicted_value: 'NaN' };
     }
+    console.log('nutrient_image:', nutrient_image);
+    console.log('product_image:', product_image);
 
     res.json({
       msg: 'Nutrients image uploaded successfully',
       analyzeResult: nutrientData,
-      coupang: product_image.includes('placeholder') ? { msg: 'No product image found' } : product_image,
+      // coupang: product_image.includes('placeholder') ? { msg: 'No product image found' } : product_image,
+      coupang: nutrient_image.includes('placeholder') ? { msg: 'No product image found' } : nutrient_image,
       health_score: prediction.predicted_value || 'NaN',
     });
   } catch (err) {

@@ -1,3 +1,5 @@
+// THIS FILE IS DEPRECATED AND NOT USED ANYMORE
+
 const { firefox } = require('playwright');
 const cheerio = require('cheerio');
 
