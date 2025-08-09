@@ -178,24 +178,32 @@ exports.getDetailedProfile = async (req, res) => {
   }
 };
 
-// 특정 날짜의 섭취 기록 조회
+// Inquiry of intake history on a specific date
 exports.getEatingHistoryByDate = async (req, res) => {
   const userId = req.user.id;
-  const { date } = req.query; // YYYY-MM-DD 형태로 프론트에서 넘김
+  // YYYY-MM-DD : /calendar/history?date=...  or  /calendar/history/:date 
+  const dateParam = req.params.date || req.query.date;
 
-  if (!date) return res.status(400).json({ msg: 'Date is required' });
+  if (!dateParam) {
+    return res.status(400).json({ msg: 'Date is required (YYYY-MM-DD)' });
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+    return res.status(400).json({ msg: 'Invalid date format. Use YYYY-MM-DD' });
+  }
 
   try {
-    const eatingHistory = await userService.getEatingHistoryByIdAndDate(userId, date);
+    // Look up the range(from 00:00:00 on that date ~ 00:00:00 on the next day)
+    const eatingHistory = await userService.getEatingHistoryByDateRange(userId, dateParam);
     if (!eatingHistory || eatingHistory.length === 0) {
       return res.status(404).json({ msg: 'No eating history found for this date' });
     }
-    res.json({ date, records: eatingHistory });
+    return res.json({ date: dateParam, records: eatingHistory });
   } catch (error) {
     console.error('Error fetching eating history:', error);
     return res.status(500).json({ msg: 'Error fetching eating history' });
   }
 };
+
 
 exports.deleteAccount = async (req, res) => {
   console.log('Deleting account for user:', req.user.id);
