@@ -118,11 +118,7 @@ exports.uploadNutrientsImage = async (req, res) => {
     // const product_image = await productService.fetchProductImage(nutrientData.food_name) || 'uploads/product_images/placeholder.jpg';
     const product_image = 'uploads/product_images/placeholder.jpg'; // Placeholder for product image
 
-    await userService.insertEatingHistory(user_id, {
-      ...nutrientData,
-      product_image,
-      nutrient_image,
-    });
+    
 
     try {
       console.log('Sending data to Python script for prediction:', nutrientData);
@@ -131,6 +127,14 @@ exports.uploadNutrientsImage = async (req, res) => {
       console.error('Error running prediction:', error);
       prediction = { predicted_value: 'NaN' };
     }
+
+    await userService.insertEatingHistory(user_id, {
+      ...nutrientData,
+      product_image,
+      nutrient_image,
+      health_score: prediction.predicted_value || 'NaN',
+    });
+
     console.log('nutrient_image:', nutrient_image);
     console.log('product_image:', product_image);
 

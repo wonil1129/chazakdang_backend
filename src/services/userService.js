@@ -147,14 +147,15 @@ exports.updateProfileImage = (user_id, profile_image) => {
 exports.insertEatingHistory = (user_id, data) => {
     const sql = `
     INSERT INTO eating_history (
-      user_id, eating_time, food_name, calories, protein, fat,
+      user_id, health_score, eating_time, food_name, calories, protein, fat,
       carbohydrate, sugar, sodium, cholesterol, saturated_fat,
       trans_fat, food_weight, product_image, nutrient_image,
       nutrient_list, rating, review_text
-    ) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
     const values = [
       user_id,
+      data.health_score,
       data.food_name,
       data.calories,
       data.protein,
