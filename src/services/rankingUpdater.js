@@ -23,6 +23,8 @@ async function updateDailyRanking() {
             GROUP BY a.user_id
             ORDER BY daily_score DESC
             LIMIT 10
+            ON DUPLICATE KEY UPDATE
+                score = VALUES(score)
         `;
         const [rows] = await conn.query(insertSql);
         await conn.commit(); // 트랜잭션 커밋
