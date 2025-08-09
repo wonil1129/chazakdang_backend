@@ -4,6 +4,8 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
+// The groundingTool is used for web searches.
+// We are specifying Google Search as the tool to be used.
 const groundingTool = {
   googleSearch: {},
 };
@@ -13,24 +15,25 @@ exports.analyzeNutrients = async (imagePath, userInfo) => {
 
   const base64ImageFile = fs.readFileSync(imagePath, { encoding: 'base64' });
 
+  // Prompt the model to output a JSON string, but without enforcing it with the API.
+  // The model will still do its best to adhere to this format.
   const prompt = `
-이 이미지는 식품 포장지에 있는 영양 정보 라벨입니다. 아래 정보를 추출하고 사용자 건강 정보를 참고해 분석한 결과를 JSON 형식으로 반환하세요. 출력은 반드시 JSON만 포함해야 합니다.
-이미지에서 정확한 영양 정보를 추출하고, 확실히 알아볼 수 없는 텍스트는 'NaN'으로 표기하세요.
-제조판매원, 
+이 식품 이미지를 검색 도구를 사용해 검색하고 아래 정보를 추출하여 사용자 건강 정보를 참고해 분석한 결과를 JSON 형식으로 반환하세요. 출력은 반드시 JSON만 포함해야 합니다.
+이미지에서 정확한 영양 정보를 추출하고, 확실히 알아볼 수 없는 텍스트는 default 값으로 표기하세요.
 
 필드:
 - food_name (제품명)
-- calories (총 열량, kcal 단위)
-- protein (단백질, g)
-- fat (지방, g)
-- carbohydrate (탄수화물, g)
-- sugar (당류, g)
-- sodium (나트륨, mg)
-- cholesterol (콜레스테롤, mg)
-- saturated_fat (포화지방, g)
-- trans_fat (트랜스지방, g)
-- food_weight (표기된 총 중량, 예: "84g")
-- ingredients (대체당, 인공 감미료, 쉼표로 구분된 문자열) 대체당 리스트 = [D-말티톨, 소비톨, 에리스리톨, 폴리글리시톨, 수크랄로스, 아세설팜, 아스파탐, 스테비아, 사카린] 이름 뒤에 시럽 또는 액이 붙어도 대체당으로 간주
+- calories (총 열량, kcal 단위) default: -1
+- protein (단백질, g) default: -1
+- fat (지방, g) default: -1
+- carbohydrate (탄수화물, g) default: -1
+- sugar (당류, g) default: -1
+- sodium (나트륨, mg) default: -1
+- cholesterol (콜레스테롤, mg) default: -1
+- saturated_fat (포화지방, g) default: -1
+- trans_fat (트랜스지방, g) default: -1
+- food_weight (표기된 총 중량, 예: "84g") default: -1
+- ingredients (대체당, 인공 감미료, 쉼표로 구분된 문자열. 원재료 목록이 아닌 대체당 리스트만 출력) 대체당 리스트 = [D-말티톨, 소비톨, 에리스리톨, 폴리글리시톨, 수크랄로스, 아세설팜, 아스파탐, 스테비아, 사카린] 이름 뒤에 시럽 또는 액이 붙어도 대체당으로 간주 default: '없음'
 - rating (건강에 대한 평점, 1~5 정수로)
 - review_text (이 식품이 사용자에게 미치는 건강 영향 분석, 반드시 한국어로 서술)
 
@@ -62,44 +65,36 @@ exports.analyzeNutrients = async (imagePath, userInfo) => {
     model: 'gemini-2.5-flash',
     contents: contents,
     config: {
-      responseMimeType: 'application/json',
-      responseSchema: {
-        type: 'object',
-        properties: {
-          food_name: { type: 'string' },
-          calories: { type: 'number' },
-          protein: { type: 'number' },
-          fat: { type: 'number' },
-          carbohydrate: { type: 'number' },
-          sugar: { type: 'number' },
-          sodium: { type: 'number' },
-          cholesterol: { type: 'number' },
-          saturated_fat: { type: 'number' },
-          trans_fat: { type: 'number' },
-          food_weight: { type: 'string' },
-          ingredients: { type: 'string' },
-          rating: {
-            type: 'integer',
-            minimum: 1,
-            maximum: 5,
-            description: '건강 평가 점수 (1~5 정수)',
-          },
-          review_text: {
-            type: 'string',
-            description: '사용자 건강 상태 기반 분석 결과 (한국어)',
-          },
-        },
-        required: [
-          'food_name', 'calories', 'protein', 'fat', 'carbohydrate', 'sugar',
-          'sodium', 'cholesterol', 'saturated_fat', 'trans_fat', 'food_weight',
-          'ingredients', 'rating', 'review_text',
-        ],
-      },
+      // The API does not support using 'tools' and 'responseMimeType' simultaneously.
+      // Therefore, these parameters are removed to enable the search tool.
       tools: [groundingTool],
     },
   });
 
+  const rawText = response.text;
 
-  const result = await response.text;
-  return result;
+  // ===================================
+  // Manual parsing of the JSON from the raw text response
+  // ===================================
+  console.log("Raw text response from Gemini:", rawText);
+
+  // Use a regular expression to find the JSON string within the response.
+  // This is a common method but can be fragile if the model's output format varies.
+  const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+
+  if (jsonMatch) {
+    try {
+      // Parse the matched JSON string
+      const parsedResult = JSON.parse(jsonMatch[0]);
+      console.log("Successfully parsed JSON:", parsedResult);
+      return parsedResult;
+    } catch (e) {
+      console.error("Failed to parse JSON from response:", e);
+      // If parsing fails, you can return a structured error or null
+      throw new Error("Failed to parse JSON from model output.");
+    }
+  } else {
+    console.error("No JSON found in the model's response.");
+    throw new Error("Model did not return a valid JSON structure.");
+  }
 };
