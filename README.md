@@ -78,7 +78,11 @@ http://localhost:3000/api/ranking/monthlyRanking
 method: GET
 => {"rank": "랭킹 순위", "user_name": "이름", "profile_image": "프로필 이미지", "monthly_score": "월간 건강 점수"}
 
-
+## 캘린더 조회
+http://localhost:3000/api/user/calendar/history
+method: GET
+-H "Authorization: Bearer 토큰" 
+=> {"eating_time": 먹은 시간, "food_name": 음식 이름, "calories": 칼로리, "protein": "단백질", "fat": "지방", "carbohydrate": "탄수화물", "sugar": "당", "sodium": "나트륨"}
 # DB
 
 ## user
@@ -113,7 +117,7 @@ CREATE TABLE eating_history (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id VARCHAR(50) NOT NULL,
     eating_time DATETIME NOT NULL DEFAULT NOW(),
-    food_name VARCHAR(30),
+    food_name VARCHAR(255),
     calories FLOAT NOT NULL,
     protein FLOAT NOT NULL,
     fat FLOAT NOT NULL,
