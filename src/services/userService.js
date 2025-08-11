@@ -70,24 +70,19 @@ exports.checkDuplicateId = (user_id) => {
     });
 };
 
-exports.getEatingHistoryByDateRange = (user_id, date) => {
-  return new Promise((resolve, reject) => {
-    const sql = `
-      SELECT eating_time, food_name, calories, protein, fat, carbohydrate, sugar, sodium,
-             cholesterol, saturated_fat, trans_fat, health_score,
-             product_image, nutrient_image, nutrient_list, rating, review_text
-      FROM eating_history
-      WHERE user_id = ?
-        AND eating_time >= ?
-        AND eating_time < DATE_ADD(?, INTERVAL 1 DAY)
-      ORDER BY eating_time ASC
-    `;
-    // YYYY-MM-DD' to DATETIME, MySQL interprets 'YYYY-MM-DD 00:00:00
-    db.query(sql, [user_id, date, date], (err, results) => {
-      if (err) return reject(err);
-      resolve(results);
-    });
-  });
+exports.getEatingHistoryByIdAndDate = (user_id, date) => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+          SELECT eating_time, food_name, calories, protein, fat, carbohydrate, sugar, sodium
+          FROM eating_history
+          WHERE user_id = ? AND DATE(eating_time) = ?
+          ORDER BY eating_time ASC
+        `;
+        db.query(sql, [user_id, date], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+        })
+    })
 };
 
 exports.updateUserName = (user_id, user_name) => {
