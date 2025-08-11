@@ -142,7 +142,7 @@ CREATE TABLE ranking_log (
     user_id VARCHAR(50) NOT NULL, -- 사용자 ID
     ranking_type ENUM('daily', 'weekly', 'monthly') NOT NULL, -- 랭킹 종류
     score FLOAT NOT NULL, -- 해당 시점의 평균 건강 점수
-    rank_date DATE NOT NULL, -- 점수가 집계된 날짜
+    rank_date DATE NOT NULL, unique -- 점수가 집계된 날짜
     FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
 

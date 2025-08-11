@@ -16,7 +16,7 @@ async function updateDailyRanking() {
                 a.user_id, 
                 'daily', 
                 AVG(b.health_score) AS daily_score,
-                CURDATE()
+                CURDATE() as rank_date
             FROM user a
             JOIN eating_history b ON a.user_id = b.user_id
             WHERE DATE(b.eating_time) = CURDATE()
@@ -51,7 +51,7 @@ async function updateWeeklyRanking() {
                 a.user_id, 
                 'weekly', 
                 AVG(b.health_score) AS weekly_score,
-                CURDATE()
+                DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) as rank_date
             FROM user a
             JOIN eating_history b ON a.user_id = b.user_id
             WHERE YEARWEEK(b.eating_time, 0) = YEARWEEK(CURDATE(), 0)
@@ -86,7 +86,7 @@ async function updateMonthlyRanking() {
                 a.user_id, 
                 'monthly', 
                 AVG(b.health_score) AS monthly_score,
-                CURDATE() 
+                DATE_FORMAT(CURDATE(), '%Y-%m-01') AS rank_date
             FROM user a
             JOIN eating_history b ON a.user_id = b.user_id
             WHERE MONTH(b.eating_time) = MONTH(CURDATE())

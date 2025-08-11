@@ -62,7 +62,7 @@ exports.weeklyRanking = (req, res) => {
             FROM user a
             JOIN ranking_log b ON a.user_id = b.user_id
             WHERE b.ranking_type = 'weekly'
-            AND b.rank_date = CURDATE()
+            AND b.rank_date = DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)
         )
         SELECT *
         FROM ranked
@@ -107,7 +107,8 @@ exports.monthlyRanking = (req, res) => {
             FROM user a
             JOIN ranking_log b ON a.user_id = b.user_id
             WHERE b.ranking_type = 'monthly'
-            AND b.rank_date = CURDATE()
+            AND b.rank_date = DATE_FORMAT(CURDATE(), '%Y-%m-01')
+
         )
         SELECT *
         FROM ranked
