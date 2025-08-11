@@ -22,7 +22,6 @@ async function updateDailyRanking() {
             WHERE DATE(b.eating_time) = CURDATE()
             GROUP BY a.user_id
             ORDER BY daily_score DESC
-            LIMIT 10
             ON DUPLICATE KEY UPDATE
                 score = VALUES(score)
         `;
@@ -58,6 +57,8 @@ async function updateWeeklyRanking() {
             WHERE YEARWEEK(b.eating_time, 0) = YEARWEEK(CURDATE(), 0)
             GROUP BY a.user_id
             ORDER BY weekly_score DESC
+            ON DUPLICATE KEY UPDATE
+                score = VALUES(score)
         `;
         const [rows] = await conn.query(insertSql);
         await conn.commit();
@@ -92,6 +93,8 @@ async function updateMonthlyRanking() {
             AND YEAR(b.eating_time) = YEAR(CURDATE())
             GROUP BY a.user_id
             ORDER BY monthly_score DESC
+            ON DUPLICATE KEY UPDATE
+                score = VALUES(score)
         `;
         const [rows] = await conn.query(insertSql);
         await conn.commit();
