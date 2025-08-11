@@ -137,6 +137,8 @@ CREATE TABLE eating_history (
     FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
 
+## ranking_log
+
 CREATE TABLE ranking_log (
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, -- 자동 증가 기본키
     user_id VARCHAR(50) NOT NULL, -- 사용자 ID
@@ -146,7 +148,26 @@ CREATE TABLE ranking_log (
     FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
 
+## board
 
+CREATE TABLE  board(
+    post_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(50) NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    content TEXT NOT NULL,
+    created_at DATETIME
+);
+
+## comment
+
+create table comment(
+	comment_id int auto_increment primary key,
+    post_id int,
+    user_id varchar(50),
+    content text not null,
+    created_at datetime,
+    foreign key (post_id) references board(post_id)
+);
 
 
 

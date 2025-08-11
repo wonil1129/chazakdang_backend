@@ -6,7 +6,7 @@ const fs = require('fs');
 const app = express();
 const userRoutes = require('./src/routes/userRoutes');
 const rankingRoutes = require('./src/routes/rankingRoutes');
-const inquiryRoutes = require('./src/routes/inquiryRoutes');
+const boardRoutes = require('./src/routes/boardRoutes');
 
 app.use(express.json());
 
@@ -14,7 +14,7 @@ app.use('/uploads', express.static('uploads'));
 
 app.use('/api/user', userRoutes);
 app.use('/api/ranking', rankingRoutes);
-app.user('/api/inquiry', inquiryRoutes);;
+app.user('/api/board', boardRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
