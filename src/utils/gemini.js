@@ -32,7 +32,7 @@ exports.analyzeNutrients = async (imagePath, userInfo) => {
 - cholesterol (콜레스테롤, mg) default: -1
 - saturated_fat (포화지방, g) default: -1
 - trans_fat (트랜스지방, g) default: -1
-- food_weight (표기된 총 중량, 예: "84g") default: -1
+- food_weight (표기된 총 중량, 예: "84") default: -1 84g일시 84, 1.5L일시 1500으로, 1500ml일시 1500으로
 - ingredients (대체당, 인공 감미료, 쉼표로 구분된 문자열. 원재료 목록이 아닌 대체당 리스트만 출력) 대체당 리스트 = [D-말티톨, 소비톨, 에리스리톨, 폴리글리시톨, 수크랄로스, 아세설팜, 아스파탐, 스테비아, 사카린] 이름 뒤에 시럽 또는 액이 붙어도 대체당으로 간주 default: '없음'
 - rating (건강에 대한 평점, 1~5 정수로)
 - review_text (이 식품이 사용자에게 미치는 건강 영향 분석, 반드시 한국어로 서술)
@@ -47,6 +47,7 @@ exports.analyzeNutrients = async (imagePath, userInfo) => {
 - 질병 정보: ${userInfo.dis}
 
 주의: JSON 이외의 문장은 절대 출력하지 마세요.
+만약 검색한 내용에 비어있는 정보값들이 존재하면 다시 검색해서 정보값 찾아와
 `;
 
   const contents = [

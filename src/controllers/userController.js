@@ -9,6 +9,7 @@ const path = require('path');
 const auth = require('../middleware/auth');
 const db = require('../../config/db');
 const predictionService = require('../services/predictionService');
+const { analyzeFoodItem } = require('../services/health_scorer.js');
 
 exports.checkDuplicateId = async (req, res) => {
   const user_id = req.body.user_id;
@@ -117,12 +118,24 @@ exports.uploadNutrientsImage = async (req, res) => {
     const nutrientData = await nutrientService.analyzeNutrients(req.file.path, userInfo);
     // const product_image = await productService.fetchProductImage(nutrientData.food_name) || 'uploads/product_images/placeholder.jpg';
     const product_image = 'uploads/product_images/placeholder.jpg'; // Placeholder for product image
-
-    
-
     try {
       console.log('Sending data to Python script for prediction:', nutrientData);
       prediction = await predictionService.runPrediction(nutrientData);
+      // prediction = analyzeFoodItem({
+      //   food_weight: nutrientData.food_weight,
+      //   sugar: nutrientData.sugar,
+      //   sodium: nutrientData.sodium,
+      //   calories: nutrientData.calories,
+      //   protein: nutrientData.protein,
+      //   fat: nutrientData.fat,
+      //   carbohydrate: nutrientData.carbohydrate,
+      //   saturated_fat: nutrientData.saturated_fat,
+      // }, {
+      //   isBeverage: false,
+      //   sugarIsFree: nutrientData.sugar=="0"?true:false,
+      //   hasNSS: false,
+      //   applyPolicyCaps: false,
+      // });
     } catch (error) {
       console.error('Error running prediction:', error);
       prediction = { predicted_value: 'NaN' };
@@ -132,7 +145,8 @@ exports.uploadNutrientsImage = async (req, res) => {
       ...nutrientData,
       product_image,
       nutrient_image,
-      health_score: prediction.predicted_value || 'NaN',
+      health_score: prediction.predicted_value || -1,
+      // health_score: prediction.score || '-1',
     });
 
     console.log('nutrient_image:', nutrient_image);
@@ -143,7 +157,8 @@ exports.uploadNutrientsImage = async (req, res) => {
       analyzeResult: nutrientData,
       // coupang: product_image.includes('placeholder') ? { msg: 'No product image found' } : product_image,
       coupang: nutrient_image.includes('placeholder') ? { msg: 'No product image found' } : nutrient_image,
-      health_score: prediction.predicted_value || 'NaN',
+      // health_score: prediction.predicted_value || 'NaN',
+      health_score: prediction.score || 'NaN',
     });
   } catch (err) {
     console.error('Upload error:', err);
