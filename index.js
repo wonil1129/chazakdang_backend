@@ -6,6 +6,7 @@ const fs = require('fs');
 const app = express();
 const userRoutes = require('./src/routes/userRoutes');
 const rankingRoutes = require('./src/routes/rankingRoutes');
+const inquiryRoutes = require('./src/routes/inquiryRoutes');
 
 app.use(express.json());
 
