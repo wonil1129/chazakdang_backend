@@ -5,7 +5,7 @@ const db = require('../../config/db'); // 데이터베이스 연결 설정 파�
 // 일간 랭킹을 계산하고 저장하는 함수
 async function updateDailyRanking() {
     console.log('일간 랭킹 업데이트 시작...');
-    const conn = await db.getConnection(); // Connection Pool에서 연결 가져오기
+    const conn = await db.promise().getConnection(); // Connection Pool에서 연결 가져오기
     try {
         await conn.beginTransaction(); // 트랜잭션 시작
 
@@ -39,7 +39,9 @@ async function updateDailyRanking() {
 // 주간 랭킹을 계산하고 저장하는 함수
 async function updateWeeklyRanking() {
     console.log('주간 랭킹 업데이트 시작...');
-    const conn = await db.getConnection();
+    const conn = await db.promise().getConnection();
+
+
     try {
         await conn.beginTransaction();
 
@@ -74,7 +76,8 @@ async function updateWeeklyRanking() {
 // 월간 랭킹을 계산하고 저장하는 함수
 async function updateMonthlyRanking() {
     console.log('월간 랭킹 업데이트 시작...');
-    const conn = await db.getConnection();
+    const conn = await db.promise().getConnection();
+
     try {
         await conn.beginTransaction();
 
