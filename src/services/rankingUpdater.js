@@ -89,7 +89,7 @@ async function updateMonthlyRanking() {
             FROM user a
             JOIN eating_history b ON a.user_id = b.user_id
             WHERE MONTH(b.eating_time) = MONTH(CURDATE())
-            AND YEAR(b.eat_time) = YEAR(CURDATE())
+            AND YEAR(b.eating_time) = YEAR(CURDATE())
             GROUP BY a.user_id
             ORDER BY monthly_score DESC
         `;
