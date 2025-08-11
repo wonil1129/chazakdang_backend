@@ -17,20 +17,20 @@ exports.dailyRanking = (req, res) => {
             FROM user a
             JOIN ranking_log b ON a.user_id = b.user_id
             WHERE b.ranking_type = 'daily'
-              AND b.rank_date = CURDATE()
+            AND b.rank_date = CURDATE()
         )
         SELECT *
         FROM ranked
         WHERE user_rank <= 10 OR user_id = ?
         ORDER BY user_rank
     `;
-
     db.query(sql, [user_id], (err, results) => {
         if (err || results.length === 0) {
             return res.status(500).json({ msg: '일간 랭킹 조회에 실패했습니다.', err });
         }
 
         // Separate top 10 and requesting user's rank
+
         const dailyRanking = results
             .filter(r => r.user_rank <= 10)
             .map(r => ({
@@ -40,7 +40,7 @@ exports.dailyRanking = (req, res) => {
                 daily_score: r.daily_score
             }));
 
-        const userRanking = results.find(r => r.user_id === user_id);
+        const userRanking = results.find(r => r.user_id == user_id);
 
         res.json({ dailyRanking, userRanking });
     });
@@ -49,46 +49,89 @@ exports.dailyRanking = (req, res) => {
 
 
 exports.weeklyRanking = (req, res) => {
-    const sql = `SELECT a.user_name, a.profile_image, b.score AS weekly_score
-                FROM user a
-                JOIN ranking_log b ON a.user_id = b.user_id
-                where b.ranking_type = 'weekly' and YEARWEEK(b.rank_date, 0) = YEARWEEK(CURDATE(), 0)
-                ORDER BY weekly_score DESC, b.user_id ASC
-                LIMIT 10`;
-    db.query(sql, (err, results) => {
-        if(err || results.length == 0) {return res.status(500).json({ msg: '주간 랭킹 조회에 실패했습니다.', err });}
+    const user_id = req.user.id; // assuming user ID comes from auth middleware
 
-        const weeklyRanking = results.map((row, index) => ({
-            rank: index + 1,
-            user_name: row.user_name,
-            profile_image: row.profile_image,
-            weekly_score: row.weekly_score
-        }));
-        
-        res.json({ weeklyRanking });
+    const sql = `
+        WITH ranked AS (
+            SELECT
+                a.user_id,
+                a.user_name,
+                a.profile_image,
+                b.score AS weekly_score,
+                RANK() OVER (ORDER BY b.score DESC, b.user_id ASC) AS user_rank
+            FROM user a
+            JOIN ranking_log b ON a.user_id = b.user_id
+            WHERE b.ranking_type = 'weekly'
+            AND b.rank_date = CURDATE()
+        )
+        SELECT *
+        FROM ranked
+        WHERE user_rank <= 10 OR user_id = ?
+        ORDER BY user_rank
+    `;
+
+    db.query(sql, [user_id], (err, results) => {
+        if (err || results.length === 0) {
+            return res.status(500).json({ msg: '주간 랭킹 조회에 실패했습니다.', err });
+        }
+
+        // Separate top 10 and requesting user's rank
+        const weeklyRanking = results
+            .filter(r => r.user_rank <= 10)
+            .map(r => ({
+                rank: r.user_rank,
+                user_name: r.user_name,
+                profile_image: r.profile_image,
+                weekly_score: r.weekly_score
+            }));
+
+        // const userRanking = results.find(r => r.user_id === user_id);
+        const userRanking = results[0];
+
+        res.json({ weeklyRanking, userRanking });
     });
-
 };
 
 
 exports.monthlyRanking = (req, res) => {
-    const sql = `SELECT a.user_name, a.profile_image, b.score AS monthly_score
-                FROM user a
-                JOIN ranking_log b ON a.user_id = b.user_id
-                where b.ranking_type = 'monthly' and MONTH(b.rank_date) = MONTH(CURDATE()) AND YEAR(b.rank_date) = YEAR(CURDATE())
-                ORDER BY monthly_score DESC, b.user_id ASC
-                LIMIT 10`;
-    db.query(sql, (err, results) => {
-        if(err || results.length == 0) {return res.status(500).json({ msg: '월간 랭킹 조회에 실패했습니다.', err });}
+    const user_id = req.user.id; // assuming user ID comes from auth middleware
 
-        const monthlyRanking = results.map((row, index) => ({
-            rank: index + 1,
-            user_name: row.user_name,
-            profile_image: row.profile_image,
-            monthly_score: row.monthly_score
-        }));
-        
-        res.json({ monthlyRanking });
+    const sql = `
+        WITH ranked AS (
+            SELECT
+                a.user_id,
+                a.user_name,
+                a.profile_image,
+                b.score AS monthly_score,
+                RANK() OVER (ORDER BY b.score DESC, b.user_id ASC) AS user_rank
+            FROM user a
+            JOIN ranking_log b ON a.user_id = b.user_id
+            WHERE b.ranking_type = 'monthly'
+            AND b.rank_date = CURDATE()
+        )
+        SELECT *
+        FROM ranked
+        WHERE user_rank <= 10 OR user_id = ?
+        ORDER BY user_rank
+    `;
+
+    db.query(sql, [user_id], (err, results) => {
+        if (err || results.length === 0) {
+            return res.status(500).json({ msg: '월간 랭킹 조회에 실패했습니다.', err });
+        }
+
+        // Separate top 10 and requesting user's rank
+        const monthlyRanking = results
+            .filter(r => r.user_rank <= 10)
+            .map(r => ({
+                rank: r.user_rank,
+                user_name: r.user_name,
+                profile_image: r.profile_image,
+                monthly_score: r.monthly_score
+            }));
+
+        const userRanking = results.find(r => r.user_id === user_id);
+
+        res.json({ monthlyRanking, userRanking });
     });
-
 };
