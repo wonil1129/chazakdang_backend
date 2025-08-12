@@ -92,7 +92,7 @@ exports.updatePost = async (req, res) => {
         if (result.affectedRows === 0) {
             return res.status(404).json({ msg: 'Post not found or no changes made' });
         }
-        res.json({ msg: 'Post updated successfully' });
+        res.json({ msg: '게시글이 수정되었습니다.' });
     } catch (error) {
         console.error('Error updating post:', error );
         res.status(500).json({ msg: 'Failed to update post', error: error.message });
@@ -115,7 +115,7 @@ exports.deletePost = async (req, res) => {
         if (result.affectedRows === 0) {
             return res.status(404).json({ msg: 'Post not found' });
         }
-        res.json({ msg: 'Post deleted successfully' });
+        res.json({ msg: '게시글이 삭제되었습니다.' });
     } catch (error) {
         console.error('Error deleting post:', error);
         res.status(500).json({ msg: 'Failed to delete post', error: error.message });
