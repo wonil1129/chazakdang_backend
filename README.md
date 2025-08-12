@@ -83,6 +83,35 @@ http://localhost:3000/api/user/calendar/history
 method: GET
 -H "Authorization: Bearer 토큰" 
 => {"eating_time": 먹은 시간, "food_name": 음식 이름, "calories": 칼로리, "protein": "단백질", "fat": "지방", "carbohydrate": "탄수화물", "sugar": "당", "sodium": "나트륨"}
+
+## 게시판 등록
+http://localhost:3000/api/board/create
+method: POST
+-H "Authorization: Bearer 토큰" -d '{"user_id": "아이디", "title": "글 제목", "content": "글 내용"}'
+=> { "msg": '게시글이 등록되었습니다.'}
+
+## 댓글 등록
+http://localhost:3000/api/board/comment
+method: POST
+-H "Authorization: Bearer 토큰" -d '{"user_id": "아이디",  "content": "댓글 내용"}'
+=> { "msg": '댓글이 등록되었습니다.'}
+
+## 게시글 목록 조회
+http://localhost:3000/api/board/list
+method: GET
+-d '{"page": "페이지 번호"}'
+=> {"post_id": "게시글 번호", "title": "제목", "created_at": "게시글 생성 일자"}
+
+## 게시글 상세 조회
+http://localhost:3000/api/board/detail
+method: GET
+-d '{"page": "페이지 번호"}'
+=> {"post_id": "게시글 번호", "title": "제목", "created_at": "게시글 생성 일자"}
+
+
+
+
+
 # DB
 
 ## user
