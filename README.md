@@ -103,13 +103,22 @@ method: GET
 => {"post_id": "게시글 번호", "title": "제목", "created_at": "게시글 생성 일자"}
 
 ## 게시글 상세 조회
-http://localhost:3000/api/board/detail
+http://localhost:3000/api/board/detail/:id
 method: GET
 -d '{"page": "페이지 번호"}'
 => {"post_id": "게시글 번호", "title": "제목", "created_at": "게시글 생성 일자"}
 
+## 게시글 수정
+http://localhost:3000/api/board/update/:id
+method: PUT
+-H "Authorization: Bearer 토큰" -d '{"title": "글 제목", "content": "글 내용"}'
+=> {"msg": '게시글이 수정되었습니다.'}
 
-
+## 게시글 삭제
+http://localhost:3000/api/board/delete/:id
+method: DELETE
+-H "Authorization: Bearer 토큰"
+=> {"msg": '게시글이 삭제되었습니다.'}
 
 
 # DB
