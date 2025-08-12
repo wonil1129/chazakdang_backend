@@ -14,7 +14,7 @@ app.use('/uploads', express.static('uploads'));
 
 app.use('/api/user', userRoutes);
 app.use('/api/ranking', rankingRoutes);
-app.user('/api/board', boardRoutes);
+// app.user('/api/board', boardRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

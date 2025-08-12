@@ -121,6 +121,7 @@ exports.uploadNutrientsImage = async (req, res) => {
     try {
       console.log('Sending data to Python script for prediction:', nutrientData);
       prediction = await predictionService.runPrediction(nutrientData);
+      console.log("prediction: ", prediction);
       // prediction = analyzeFoodItem({
       //   food_weight: nutrientData.food_weight,
       //   sugar: nutrientData.sugar,
@@ -149,16 +150,13 @@ exports.uploadNutrientsImage = async (req, res) => {
       // health_score: prediction.score || '-1',
     });
 
-    console.log('nutrient_image:', nutrient_image);
-    console.log('product_image:', product_image);
-
     res.json({
       msg: 'Nutrients image uploaded successfully',
       analyzeResult: nutrientData,
       // coupang: product_image.includes('placeholder') ? { msg: 'No product image found' } : product_image,
       coupang: nutrient_image.includes('placeholder') ? { msg: 'No product image found' } : nutrient_image,
       // health_score: prediction.predicted_value || 'NaN',
-      health_score: prediction.score || 'NaN',
+      health_score: prediction.predicted_value || 'NaN',
     });
   } catch (err) {
     console.error('Upload error:', err);
