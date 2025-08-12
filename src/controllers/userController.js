@@ -10,6 +10,7 @@ const auth = require('../middleware/auth');
 const db = require('../../config/db');
 const predictionService = require('../services/predictionService');
 const { analyzeFoodItem } = require('../services/health_scorer.js');
+const searchFoodData = require('../utils/searchFoodData.js');
 
 exports.checkDuplicateId = async (req, res) => {
   const user_id = req.body.user_id;
@@ -115,28 +116,21 @@ exports.uploadNutrientsImage = async (req, res) => {
 
   try {
     const userInfo = await userService.getUserDetailedInfo(req.user.id);
-    const nutrientData = await nutrientService.analyzeNutrients(req.file.path, userInfo);
+    let nutrientData = await nutrientService.analyzeNutrients(req.file.path, userInfo);
     // const product_image = await productService.fetchProductImage(nutrientData.food_name) || 'uploads/product_images/placeholder.jpg';
     const product_image = 'uploads/product_images/placeholder.jpg'; // Placeholder for product image
+
+    // 품목보고번호로 식품정보 가져오는 함수 호출
+    try {
+      nutrientData = await searchFoodData.getFoodDataFromProductID(nutrientData);
+    } catch (error) {
+      console.error(error);
+    }
+
     try {
       console.log('Sending data to Python script for prediction:', nutrientData);
       prediction = await predictionService.runPrediction(nutrientData);
       console.log("prediction: ", prediction);
-      // prediction = analyzeFoodItem({
-      //   food_weight: nutrientData.food_weight,
-      //   sugar: nutrientData.sugar,
-      //   sodium: nutrientData.sodium,
-      //   calories: nutrientData.calories,
-      //   protein: nutrientData.protein,
-      //   fat: nutrientData.fat,
-      //   carbohydrate: nutrientData.carbohydrate,
-      //   saturated_fat: nutrientData.saturated_fat,
-      // }, {
-      //   isBeverage: false,
-      //   sugarIsFree: nutrientData.sugar=="0"?true:false,
-      //   hasNSS: false,
-      //   applyPolicyCaps: false,
-      // });
     } catch (error) {
       console.error('Error running prediction:', error);
       prediction = { predicted_value: 'NaN' };

@@ -26,6 +26,7 @@ async function analyzeNutrients(imagePath, userInfo) {
     nutrient_list: result.ingredients || '',
     rating: result.rating || 1,
     review_text: result.review_text || '리뷰 없음',
+    product_id: result.product_id || '0',
   };
 }
 
