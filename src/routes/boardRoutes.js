@@ -1,7 +1,7 @@
-// const express = require('express');
-// const router = express.Router();
-// const boardController = require('../controllers/boardController');
-// const { verifyToken } = require('../middleware/auth');
+const express = require('express');
+const router = express.Router();
+const boardController = require('../controllers/boardController');
+const { verifyToken } = require('../middleware/auth');
 
 router.post('/create', verifyToken, boardController.createBoard);
 router.post('/comment', verifyToken, boardController.createComment);

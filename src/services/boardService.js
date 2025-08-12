@@ -27,7 +27,7 @@ exports.createComment = (postId, userId, content) => {
 };
 
 // 2. 게시글 목록 조회 
-exports.getBoardList = (page) => {
+exports.getPostList = (page) => {
     return new Promise((resolve, reject) => {
         const pageSize = 10; // 페이지당 게시글 수
         const offset = (page - 1) * pageSize;
@@ -70,7 +70,12 @@ exports.getPost = (postId) => {
 // 댓글 조회 
 exports.getComments = (postId) => {
     return new Promise((resolve, reject) => {
-        const sql = `SELECT content FROM comment WHERE post_id = ? ORDER BY created_at ASC`;
+        const sql = `SELECT c.content, u.user_name
+                    FROM comment c
+                    JOIN user u ON c.user_id = u.user_id
+                    WHERE c.post_id = ?
+                    ORDER BY c.created_at ASC
+            `;
 
         pool.query(sql, [postId], (err, result) => {
             if (err) return reject(err);
@@ -114,6 +119,13 @@ exports.deletePost = (postId) => {
         });
     });
 };
+
+// 권한 함수
+exports.checkOwner = async (postId, userId) => {
+    const ownerId = await exports.getPostOwner(postId);
+    return ownerId === userId;
+};
+
 
 // 게시글 작성 유효성 검사
 exports.validatePost = (data) => {
