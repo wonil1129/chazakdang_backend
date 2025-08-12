@@ -85,6 +85,23 @@ exports.getEatingHistoryByIdAndDate = (user_id, date) => {
     })
 };
 
+exports.getTodaySummary = (user_id) => {
+  return new Promise((resolve, reject) => {
+    const sql = `
+      SELECT
+        ROUND(COALESCE(AVG(health_score), 0), 0)  AS avg_health_score,
+        ROUND(COALESCE(SUM(sugar), 0), 1)         AS sugar_g,
+        ROUND(COALESCE(SUM(calories), 0), 0)      AS calories_kcal
+      FROM eating_history
+      WHERE user_id = ? AND DATE(eating_time) = CURDATE()
+    `;
+    db.query(sql, [user_id], (err, results) => {
+      if (err) return reject(err);
+      resolve(results[0] || { avg_health_score: 0, sugar_g: 0, calories_kcal: 0 });
+    });
+  });
+};
+
 exports.updateUserName = (user_id, user_name) => {
     return new Promise((resolve, reject) => {
         const sql = 'UPDATE user SET user_name = ? WHERE user_id = ?';

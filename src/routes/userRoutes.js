@@ -19,6 +19,6 @@ router.get('/profile/detail', verifyToken, userController.getDetailedProfile);
 router.get('/calendar/history', verifyToken, userController.getEatingHistoryByDate);
 
 router.put('/update_info', verifyToken, userController.updateUserInfo);
-
+router.get('/home/today', verifyToken, userController.getTodaySummary);
 
 module.exports = router;

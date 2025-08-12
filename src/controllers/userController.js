@@ -97,6 +97,26 @@ exports.getProfile = async (req, res) => {
     }
 };
 
+exports.getTodaySummary = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const user = await userService.getUserById(userId);
+    const summary = await userService.getTodaySummary(userId);
+
+    return res.json({
+      name: user?.user_name || '',
+      avg_health_score: summary.avg_health_score,
+      totals: {
+        sugar_g: summary.sugar_g,
+        calories_kcal: summary.calories_kcal,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching today summary:', error);
+    return res.status(500).json({ msg: 'Error fetching today summary' });
+  }
+};
+
 exports.uploadProfileImage = async (req, res) => {
   const user_id = req.user.id; // JWT에서 추출한 user ID
   const imagePath = `uploads/profile_images/${req.file.filename}`;
