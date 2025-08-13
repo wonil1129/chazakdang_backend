@@ -47,7 +47,7 @@ method: POST
 
 ## 최근 먹은 음식 기록 조회
 https://localhost:3000/api/user/eating_history/recent
-method: GET
+method: POST
 -H "Authorization: Bearer 토큰" {limit: 3}
 => 
 {
