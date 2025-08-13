@@ -10,6 +10,7 @@ const db = require('../../config/db');
 const predictionService = require('../services/predictionService');
 const { analyzeFoodItem } = require('../services/health_scorer.js');
 const searchFoodData = require('../utils/searchFoodData.js');
+const rankingUpdater = require('../services/rankingUpdater.js');
 
 exports.checkDuplicateId = async (req, res) => {
   const user_id = req.body.user_id;
@@ -169,6 +170,16 @@ exports.uploadNutrientsImage = async (req, res) => {
       // health_score: prediction.predicted_value || 'NaN',
       health_score: prediction.predicted_value || 'NaN',
     });
+
+    try {
+      await rankingUpdater.updateDailyRanking();
+      await rankingUpdater.updateWeeklyRanking();
+      await rankingUpdater.updateMonthlyRanking();
+    } catch (error) {
+      console.error(error);
+    }
+
+
   } catch (err) {
     console.error('Upload error:', err);
     return res.status(500).json({ msg: 'Failed to upload nutrients image'});

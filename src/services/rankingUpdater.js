@@ -12,9 +12,9 @@ async function updateDailyRanking() {
         // 새로운 일간 랭킹 계산 및 삽입
         const insertSql = `
             INSERT INTO ranking_log (user_id, ranking_type, score, rank_date)
-            SELECT 
-                a.user_id, 
-                'daily', 
+            SELECT
+                a.user_id,
+                'daily',
                 AVG(b.health_score) AS daily_score,
                 CURDATE() as rank_date
             FROM user a
