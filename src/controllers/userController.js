@@ -153,6 +153,14 @@ exports.uploadNutrientsImage = async (req, res) => {
       console.error('Error running prediction:', error);
       prediction = { predicted_value: 'NaN' };
     }
+    res.json({
+      msg: 'Nutrients image uploaded successfully',
+      analyzeResult: nutrientData,
+      // coupang: product_image.includes('placeholder') ? { msg: 'No product image found' } : product_image,
+      coupang: nutrient_image.includes('placeholder') ? { msg: 'No product image found' } : nutrient_image,
+      // health_score: prediction.predicted_value || 'NaN',
+      health_score: prediction.predicted_value || 'NaN',
+    });
 
     await userService.insertEatingHistory(user_id, {
       ...nutrientData,
@@ -162,14 +170,6 @@ exports.uploadNutrientsImage = async (req, res) => {
       // health_score: prediction.score || '-1',
     });
 
-    res.json({
-      msg: 'Nutrients image uploaded successfully',
-      analyzeResult: nutrientData,
-      // coupang: product_image.includes('placeholder') ? { msg: 'No product image found' } : product_image,
-      coupang: nutrient_image.includes('placeholder') ? { msg: 'No product image found' } : nutrient_image,
-      // health_score: prediction.predicted_value || 'NaN',
-      health_score: prediction.predicted_value || 'NaN',
-    });
 
     try {
       await rankingUpdater.updateDailyRanking();
