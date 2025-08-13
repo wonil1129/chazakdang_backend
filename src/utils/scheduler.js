@@ -1,29 +1,35 @@
-const cron = require('node-cron');
-const {updatedailyRanking, updateweeklyRanking, updatemonthlyRanking} = require('../services/rankingUpdater');
+const { CronJob } = require('cron');
+const { updatedailyRanking, updateweeklyRanking, updatemonthlyRanking } = require('../services/rankingUpdater');
 
-cron.schedule('0 0 * * *', () => {
+// 일간 랭킹 업데이트 (매일 0시)
+new CronJob('0 0 * * *', async () => {
     console.log('일간 랭킹 업데이트');
-    updatedailyRanking()
-        .then(() => console.log('일간 랭킹 업데이트 완료'))
-        .catch(err => console.error('일간 랭킹 업데이트 실패:', err));
-}, {timezone: 'Asia/Seoul'
+    try {
+        await updatedailyRanking();
+        console.log('일간 랭킹 업데이트 완료');
+    } catch (err) {
+        console.error('일간 랭킹 업데이트 실패:', err);
+    }
+}, null, true, 'Asia/Seoul');
 
-});
-
-cron.schedule('0 0 * * 1', () => {
+// 주간 랭킹 업데이트 (매주 월요일 0시)
+new CronJob('0 0 * * 1', async () => {
     console.log('주간 랭킹 업데이트');
-    updateweeklyRanking()
-        .then(() => console.log('주간 랭킹 업데이트 완료'))
-        .catch(err => console.error('주간 랭킹 업데이트 실패:', err));
-}, {timezone: 'Asia/Seoul'
-    
-});
+    try {
+        await updateweeklyRanking();
+        console.log('주간 랭킹 업데이트 완료');
+    } catch (err) {
+        console.error('주간 랭킹 업데이트 실패:', err);
+    }
+}, null, true, 'Asia/Seoul');
 
-cron.schedule('0 0 1 * *', () => {
+// 월간 랭킹 업데이트 (매월 1일 0시)
+new CronJob('0 0 1 * *', async () => {
     console.log('월간 랭킹 업데이트');
-    updatemonthlyRanking()
-        .then(() => console.log('월간 랭킹 업데이트 완료'))
-        .catch(err => console.error('월간 랭킹 업데이트 실패:', err));
-}, {timezone: 'Asia/Seoul'
-    
-});
+    try {
+        await updatemonthlyRanking();
+        console.log('월간 랭킹 업데이트 완료');
+    } catch (err) {
+        console.error('월간 랭킹 업데이트 실패:', err);
+    }
+}, null, true, 'Asia/Seoul');
