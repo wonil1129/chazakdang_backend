@@ -45,6 +45,23 @@ method: POST
 -H "Authorization: Bearer 토큰" -F "image=@이미지 경로"
 => { msg: 'Profile image uploaded successfully', image_url: imagePath }
 
+## 최근 먹은 음식 기록 조회
+https://localhost:3000/api/user/eating_history/recent
+method: GET
+-H "Authorization: Bearer 토큰" {limit: 3}
+=> 
+{
+  "msg": "Successfully fetched recent eating history",
+  "recentEatingHistory": [
+    {
+      "id": 79,
+      "eating_time": "2025-08-13T01:11:52.000Z",
+      "food_name": "제로마일드초콜릿",
+      "health_score": 32.3564
+    }
+  ]
+}
+
 ## 제품 이미지 업로드
 http://localhost:3000/api/user/upload_product_image
 method: POST
