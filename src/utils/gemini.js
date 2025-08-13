@@ -48,7 +48,7 @@ exports.analyzeNutrients = async (imagePath, userInfo) => {
 - 질병 정보: ${userInfo.dis}
 
 주의: JSON 이외의 문장은 절대 출력하지 마세요.
-만약 검색한 내용에 비어있는 정보값들이 존재하면 다시 검색해서 정보값 찾아와
+만약 검색한 내용에 비어있는 정보값들이 존재하면 다시 검색해서 정보들을 찾아오세요
 `;
 
   const contents = [
@@ -67,8 +67,6 @@ exports.analyzeNutrients = async (imagePath, userInfo) => {
     model: 'gemini-2.5-flash',
     contents: contents,
     config: {
-      // The API does not support using 'tools' and 'responseMimeType' simultaneously.
-      // Therefore, these parameters are removed to enable the search tool.
       tools: [groundingTool],
     },
   });
@@ -87,8 +85,9 @@ exports.analyzeNutrients = async (imagePath, userInfo) => {
   if (jsonMatch) {
     try {
       // Parse the matched JSON string
-      const parsedResult = JSON.parse(jsonMatch[0]);
+      let parsedResult = JSON.parse(jsonMatch[0]);
       console.log("Successfully parsed JSON:", parsedResult);
+      parsedResult.review_text = parsedResult.review_text.replace(/\[\d+\]|\[Image\]/g, '');
       return parsedResult;
     } catch (e) {
       console.error("Failed to parse JSON from response:", e);

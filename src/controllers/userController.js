@@ -5,7 +5,6 @@ const userService = require('../services/userService');
 const nutrientService = require('../services/nutrientService');
 const productService = require('../services/productService');
 const path = require('path');
-// const { createToken } = require('../middleware/auth');
 const auth = require('../middleware/auth');
 const db = require('../../config/db');
 const predictionService = require('../services/predictionService');
@@ -139,8 +138,6 @@ exports.uploadNutrientsImage = async (req, res) => {
     let nutrientData = await nutrientService.analyzeNutrients(req.file.path, userInfo);
     // const product_image = await productService.fetchProductImage(nutrientData.food_name) || 'uploads/product_images/placeholder.jpg';
     const product_image = 'uploads/product_images/placeholder.jpg'; // Placeholder for product image
-
-    // 품목보고번호로 식품정보 가져오는 함수 호출
     try {
       nutrientData = await searchFoodData.getFoodDataFromProductID(nutrientData);
     } catch (error) {
@@ -273,5 +270,4 @@ exports.updateUserInfo = async (req, res) => {
     console.error('Error updating user info:', error);
     return res.status(500).json({ msg: 'Error updating user info' });
   }
-  
 };
