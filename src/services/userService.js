@@ -102,6 +102,22 @@ exports.getTodaySummary = (user_id) => {
   });
 };
 
+exports.getRecentEatingHistory = (user_id, limit) => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+          SELECT eating_time, food_name, health_score
+          FROM eating_history
+          WHERE user_id = ?
+          ORDER BY eating_time DESC
+          LIMIT ?
+        `;
+        db.query(sql, [user_id, limit], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+        });
+    });
+};
+
 exports.updateUserName = (user_id, user_name) => {
     return new Promise((resolve, reject) => {
         const sql = 'UPDATE user SET user_name = ? WHERE user_id = ?';

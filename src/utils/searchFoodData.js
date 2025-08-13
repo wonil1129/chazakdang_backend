@@ -45,7 +45,7 @@ exports.getFoodDataFromProductID = (nutrientData) => {
 
                 resolve({
                     ...nutrientData,
-                    food_name: recalculate_value(row['식품명'], food_weight) || nutrientData.food_name,
+                    food_name: row['식품명'] || nutrientData.food_name,
                     calories: recalculate_value(row['에너지_kcal'], food_weight) || nutrientData.calories,
                     protein: recalculate_value(row['단백질_g'], food_weight) || nutrientData.protein,
                     fat: recalculate_value(row['지방_g'], food_weight) || nutrientData.fat,

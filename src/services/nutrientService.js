@@ -12,7 +12,7 @@ async function analyzeNutrients(imagePath, userInfo) {
     }
 
     return {
-    food_name: result.food_name || '알 수 없음',
+    food_name: result.food_name,
     calories: result.calories || 0,
     protein: result.protein || 0,
     fat: result.fat || 0,

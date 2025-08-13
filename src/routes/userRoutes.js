@@ -17,6 +17,7 @@ router.post('/check_id', userController.checkDuplicateId);
 router.get('/profile', verifyToken, userController.getProfile);
 router.get('/profile/detail', verifyToken, userController.getDetailedProfile);
 router.get('/calendar/history', verifyToken, userController.getEatingHistoryByDate);
+router.get('/eating_history/recent', verifyToken, userController.getRecentEatingHistory);
 
 router.put('/update_info', verifyToken, userController.updateUserInfo);
 router.get('/home/today', verifyToken, userController.getTodaySummary);

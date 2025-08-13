@@ -224,6 +224,23 @@ exports.getEatingHistoryByDate = async (req, res) => {
   }
 };
 
+exports.getRecentEatingHistory = async (req, res) => {
+  console.log("req:", req.body.limit);
+  const userId = req.user.id;
+  const limit = req.body.limit;
+
+  try {
+    const recentEatingHistory = await userService.getRecentEatingHistory(userId, limit);
+    if (!recentEatingHistory || recentEatingHistory.length === 0) {
+      return res.status(404).json({ msg: 'No recent eating history found' });
+    }
+    return res.json({ msg: 'Successfully fetched recent eating history', recentEatingHistory: recentEatingHistory });
+  } catch (error) {
+    console.error('Error fetching recent eating history:', error);
+    return res.status(500).json({ msg: 'Error fetching recent eating history '});
+  }
+};
+
 
 exports.deleteAccount = async (req, res) => {
   console.log('Deleting account for user:', req.user.id);
