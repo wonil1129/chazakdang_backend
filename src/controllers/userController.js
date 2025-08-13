@@ -41,10 +41,8 @@ exports.register = async (req, res) => {
 
         const hashedPw = await hashPassword(user_pw);
 
-        db.beginTransaction();
         await userService.createUser(user_id, hashedPw, user_name);
         await userService.createUserInfo(user_id, age, height, weight, sex, preg, dis);
-        db.commit();
 
         const token = auth.createToken(user_id, user_name);
 
@@ -169,7 +167,6 @@ exports.uploadNutrientsImage = async (req, res) => {
       health_score: prediction.predicted_value || -1,
       // health_score: prediction.score || '-1',
     });
-
 
     try {
       await rankingUpdater.updateDailyRanking();
