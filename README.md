@@ -62,6 +62,20 @@ method: POST
   ]
 }
 
+## 오늘 사용자 기록 조회
+https://localhost:3000/api/user/home/today
+method: POST
+-H "Authorization: Bearer 토큰"
+=>
+{
+  "name": "이름",
+  "avg_health_score": 28,
+  "totals": {
+    "sugar_g": 31,
+    "calories_kcal": 700
+  }
+}
+
 ## 제품 이미지 업로드
 http://localhost:3000/api/user/upload_product_image
 method: POST
