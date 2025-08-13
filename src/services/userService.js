@@ -105,7 +105,7 @@ exports.getTodaySummary = (user_id) => {
 exports.getRecentEatingHistory = (user_id, limit) => {
     return new Promise((resolve, reject) => {
         const sql = `
-          SELECT eating_time, food_name, health_score
+          SELECT id, eating_time, food_name, health_score
           FROM eating_history
           WHERE user_id = ?
           ORDER BY eating_time DESC
