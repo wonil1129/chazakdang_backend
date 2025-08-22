@@ -109,10 +109,10 @@ http://localhost:3000/api/ranking/monthlyRanking
 method: GET
 => {"rank": "랭킹 순위", "user_name": "이름", "profile_image": "프로필 이미지", "monthly_score": "월간 건강 점수"}
 
-## 캘린더 조회
+## 특정 날짜 캘린더 조회
 http://localhost:3000/api/user/calendar/history
 method: GET
--H "Authorization: Bearer 토큰" 
+-H "Authorization: Bearer 토큰" -d '{"date": "2025-08-22"}'
 => {"eating_time": 먹은 시간, "food_name": 음식 이름, "calories": 칼로리, "protein": "단백질", "fat": "지방", "carbohydrate": "탄수화물", "sugar": "당", "sodium": "나트륨"}
 
 ## 게시판 등록
