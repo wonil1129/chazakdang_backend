@@ -12,13 +12,14 @@ router.post('/upload_nutrients_image', verifyToken, upload.single('image'), user
 router.post('/delete_account', verifyToken, userController.deleteAccount);
 router.post('/check_id', userController.checkDuplicateId);
 router.post('/eating_history/recent', verifyToken, userController.getRecentEatingHistory);
+router.post('/eating_history/edit', verifyToken, userController.editEating_history)
+router.post('/calendar/monthly/days_with_records', verifyToken, userController.getDaysWithRecords);
 
 
 // protected routes
 router.get('/profile', verifyToken, userController.getProfile);
 router.get('/profile/detail', verifyToken, userController.getDetailedProfile);
 router.get('/calendar/history', verifyToken, userController.getEatingHistoryByDate);
-router.get('/calendar/monthly/days_with_records', verifyToken, userController.getDaysWithRecords);
 
 router.put('/update_info', verifyToken, userController.updateUserInfo);
 router.post('/home/today', verifyToken, userController.getTodaySummary);

@@ -118,6 +118,53 @@ exports.getRecentEatingHistory = (user_id, limit) => {
     });
 };
 
+exports.editEatingHistory = (userId, foodId, data) => {
+    return new Promise((resolve, reject) => {
+        if (!data || typeof data !== 'object') {
+            return reject(new Error("Invalid update data provided"));
+        }
+        
+        const allowedColumns = [
+            'health_score', 'eating_time', 'food_name', 'calories',
+            'protein', 'fat', 'carbohydrate', 'sugar', 'sodium',
+            'cholesterol', 'saturated_fat', 'trans_fat', 'food_weight',
+            'product_image', 'nutrient_image', 'nutrient_list',
+            'rating', 'review_text'
+        ];
+
+        const setClauses = [];
+        const params = [];
+
+        allowedColumns.forEach(column => {
+            if (data[column] !== undefined) {
+                setClauses.push(`${column} = ?`);
+                params.push(data[column]);
+            }
+        });
+
+        if (setClauses.length === 0) {
+            return resolve({ msg: "No valid fields provided to update." });
+        }
+
+        params.push(foodId);
+        params.push(userId);
+
+        const sql = `
+            UPDATE eating_history
+            SET ${setClauses.join(', ')}
+            WHERE id = ? AND user_id = ?
+        `;
+
+        db.query(sql, params, (error, results) => {
+            if (error) {
+                console.error("Error updating eating history:", error);
+                return reject(error);
+            }
+            resolve(results);
+        });
+    });
+};
+
 exports.checkEatingHistoryExists = (userId, yearMonth) => {
     return new Promise((resolve, reject) => {
         const sql = `

@@ -256,6 +256,20 @@ exports.getRecentEatingHistory = async (req, res) => {
   }
 };
 
+exports.editEating_history = async (req, res) => {
+  const userId = req.user.id;
+  const foodId = req.body.food_id;
+  const data = req.body.data;
+
+  try {
+    const results = userService.editEatingHistory(userId, foodId, data);
+    return res.json({ msg: "Successfully updated eating history"});
+  } catch (error) {
+    console.error("Error updating eating history");
+  }
+}
+
+
 exports.getDaysWithRecords = async (req, res) => {
   const userId = req.user.id;
   const yearMonth = req.body.yearMonth;
