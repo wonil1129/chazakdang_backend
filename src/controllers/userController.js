@@ -223,7 +223,7 @@ exports.getDetailedProfile = async (req, res) => {
 // 특정 날짜의 섭취 기록 조회
 exports.getEatingHistoryByDate = async (req, res) => {
   const userId = req.user.id;
-  const { date } = req.query; // YYYY-MM-DD 형태로 프론트에서 넘김
+  const { date } = req.body; // YYYY-MM-DD 형태로 프론트에서 넘김
 
   if (!date) return res.status(400).json({ msg: 'Date is required' });
 
