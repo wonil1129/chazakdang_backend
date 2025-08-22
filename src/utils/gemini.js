@@ -11,8 +11,6 @@ const groundingTool = {
 };
 
 exports.analyzeNutrients = async (imagePath, userInfo) => {
-  console.log('Analyzing nutrients for image:', imagePath);
-
   const base64ImageFile = fs.readFileSync(imagePath, { encoding: 'base64' });
 
   // Prompt the model to output a JSON string, but without enforcing it with the API.
