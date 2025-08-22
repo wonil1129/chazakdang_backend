@@ -10,6 +10,7 @@ const db = require('../../config/db');
 const predictionService = require('../services/predictionService');
 const { analyzeFoodItem } = require('../services/health_scorer.js');
 const searchFoodData = require('../utils/searchFoodData.js');
+const searchRawFoodData = require('../utils/searchRawFoodData.js');
 const rankingUpdater = require('../services/rankingUpdater.js');
 
 exports.checkDuplicateId = async (req, res) => {
@@ -139,6 +140,11 @@ exports.uploadNutrientsImage = async (req, res) => {
     const product_image = 'uploads/product_images/placeholder.jpg'; // Placeholder for product image
     try {
       nutrientData = await searchFoodData.getFoodDataFromProductID(nutrientData);
+    } catch (error) {
+      console.error(error);
+    }
+    try {
+      nutrientData = await searchRawFoodData.getRawFoodDataFromProductID(nutrientData);
     } catch (error) {
       console.error(error);
     }

@@ -1,19 +1,19 @@
 const db = require('../../config/db');
 
 const recalculate_value = (value, food_weight) => {
+    if (typeof value !== 'number' || typeof food_weight !== 'number') return value;
     return (value / 100) * food_weight;
 };
 
-exports.getFoodDataFromProductID = (nutrientData) => {
+exports.getFoodDataFromProductID = async (nutrientData) => {
     const product_id = nutrientData.product_id;
     console.log("PRODUCTID:", product_id);
 
-    // Check if table exists query
     const checkTableSql = `
       SELECT COUNT(*) AS count
       FROM information_schema.tables
       WHERE table_schema = DATABASE()
-        AND table_name = 'food_data'`;
+      AND table_name = 'food_data'`;
 
     return new Promise((resolve, reject) => {
         db.query(checkTableSql, (err, result) => {
@@ -40,7 +40,7 @@ exports.getFoodDataFromProductID = (nutrientData) => {
                 }
 
                 const row = results[0];
-                const food_weight = results['식품중량'];
+                const food_weight = row['식품중량'];
                 console.log("DB에서 가져온 row: ", row);
 
                 resolve({
