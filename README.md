@@ -115,6 +115,21 @@ method: GET
 -H "Authorization: Bearer 토큰" -d '{"date": "2025-08-22"}'
 => {"eating_time": 먹은 시간, "food_name": 음식 이름, "calories": 칼로리, "protein": "단백질", "fat": "지방", "carbohydrate": "탄수화물", "sugar": "당", "sodium": "나트륨"}
 
+## 특정 월의 날 데이터 여부 조회
+https://localhost:3000/api/user/calendar/monthly/days_with_records
+method: GET
+-H "Authorization: Bearer 토큰" -d '{"yearMonth": "2025-08"}'
+=> {
+  "msg": "Successful",
+  "daysWithRecords": [
+    9,
+    11,
+    12,
+    13,
+    22
+  ]
+}
+
 ## 게시판 등록
 http://localhost:3000/api/board/create
 method: POST
