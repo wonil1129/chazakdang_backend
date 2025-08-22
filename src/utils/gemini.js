@@ -87,7 +87,7 @@ exports.analyzeNutrients = async (imagePath, userInfo) => {
       // Parse the matched JSON string
       let parsedResult = JSON.parse(jsonMatch[0]);
       console.log("Successfully parsed JSON:", parsedResult);
-      parsedResult.review_text = parsedResult.review_text.replace(/\[\d+\]|\[Image\]/g, '');
+      parsedResult.review_text = parsedResult.review_text.replace(/\[[\d,\s]+\]|\[Image\]/g, '');
       return parsedResult;
     } catch (e) {
       console.error("Failed to parse JSON from response:", e);

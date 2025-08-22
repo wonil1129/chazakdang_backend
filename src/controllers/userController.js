@@ -11,6 +11,7 @@ const predictionService = require('../services/predictionService');
 const { analyzeFoodItem } = require('../services/health_scorer.js');
 const searchFoodData = require('../utils/searchFoodData.js');
 const searchRawFoodData = require('../utils/searchRawFoodData.js');
+const sweetener_cleaner = require('../utils/sweetener_cleaner.js');
 const rankingUpdater = require('../services/rankingUpdater.js');
 
 exports.checkDuplicateId = async (req, res) => {
@@ -145,6 +146,11 @@ exports.uploadNutrientsImage = async (req, res) => {
     }
     try {
       nutrientData = await searchRawFoodData.getRawFoodDataFromProductID(nutrientData);
+    } catch (error) {
+      console.error(error);
+    }
+    try {
+      nutrientData = sweetener_cleaner.clean_and_standardize_nutrients(nutrientData);
     } catch (error) {
       console.error(error);
     }

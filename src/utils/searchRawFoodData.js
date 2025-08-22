@@ -13,7 +13,7 @@ exports.getRawFoodDataFromProductID = async (nutrientData) => {
         return {
             ...nutrientData,
             food_name: data.PRDLST_NM || nutrientData.food_name,
-            nutrient_list: data.RAWMTRL_NM || nutrientData.nutrient_list,
+            nutrient_list: nutrientData.nutrient_list+", "+data.RAWMTRL_NM || nutrientData.nutrient_list,
         }
     } catch (error) {
         console.error("Error fetching data from 식품안전나라:", error);
