@@ -62,6 +62,18 @@ method: POST
   ]
 }
 
+## eating_history 수정
+https://localhost:3000/api/user/eating_history/edit
+method: POST
+-H "Authorization: Bearer 토큰" 
+-d {
+  "food_id": "id",
+  "data": {}
+}
+=> {
+  "msg": "Successfully updated eating history"
+}
+
 ## 오늘 사용자 기록 조회
 https://localhost:3000/api/user/home/today
 method: POST
@@ -117,7 +129,7 @@ method: GET
 
 ## 특정 월의 날 데이터 여부 조회
 https://localhost:3000/api/user/calendar/monthly/days_with_records
-method: GET
+method: POST
 -H "Authorization: Bearer 토큰" -d '{"yearMonth": "2025-08"}'
 => {
   "msg": "Successful",
