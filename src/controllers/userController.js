@@ -241,6 +241,7 @@ exports.getEatingHistoryByDate = async (req, res) => {
   }
 };
 
+
 exports.getRecentEatingHistory = async (req, res) => {
   console.log("req:", req.body.limit);
   const userId = req.user.id;
@@ -257,7 +258,6 @@ exports.getRecentEatingHistory = async (req, res) => {
     return res.status(500).json({ msg: 'Error fetching recent eating history '});
   }
 };
-
 
 exports.deleteAccount = async (req, res) => {
   console.log('Deleting account for user:', req.user.id);
