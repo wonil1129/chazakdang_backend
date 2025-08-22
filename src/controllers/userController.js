@@ -30,7 +30,6 @@ exports.checkDuplicateId = async (req, res) => {
 
 // Register user
 exports.register = async (req, res) => {
-    console.log('Registering user:', req.body);
     const { user_id, user_pw, user_name, age, height, weight, sex, preg, dis } = req.body;
     if (!user_id || !user_pw || !user_name){
         return res.status(400).json({ msg: 'All fields required' });
@@ -198,7 +197,6 @@ exports.uploadNutrientsImage = async (req, res) => {
 
 // Get detailed user info for calendar
 exports.getDetailedProfile = async (req, res) => {
-  console.log('Fetching detailed profile for user:', req.user.id);
   const userId = req.user.id;
 
   try {
@@ -225,7 +223,7 @@ exports.getDetailedProfile = async (req, res) => {
 // 특정 날짜의 섭취 기록 조회
 exports.getEatingHistoryByDate = async (req, res) => {
   const userId = req.user.id;
-  const { date } = req.query; // YYYY-MM-DD 형태로 프론트에서 넘김
+  const { date } = req.body; // YYYY-MM-DD 형태로 프론트에서 넘김
 
   if (!date) return res.status(400).json({ msg: 'Date is required' });
 
@@ -243,7 +241,6 @@ exports.getEatingHistoryByDate = async (req, res) => {
 
 
 exports.getRecentEatingHistory = async (req, res) => {
-  console.log("req:", req.body.limit);
   const userId = req.user.id;
   const limit = req.body.limit;
 
@@ -260,12 +257,10 @@ exports.getRecentEatingHistory = async (req, res) => {
 };
 
 exports.deleteAccount = async (req, res) => {
-  console.log('Deleting account for user:', req.user.id);
   const userId = req.user.id;
 
   try {
     await userService.deleteUser(userId);
-    console.log('User account deleted successfully');
     res.json({ msg: 'Account deleted successfully.' });
   } catch (error) {
     console.error('Error deleting user account:', error);
@@ -274,7 +269,6 @@ exports.deleteAccount = async (req, res) => {
 };
 
 exports.updateUserInfo = async (req, res) => {
-  console.log('Updating user info for user:', req.user.id);
   const user_id = req.user.id;
   const { user_name, age, height, weight, sex, preg, dis } = req.body;
 
