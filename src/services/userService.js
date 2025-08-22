@@ -118,6 +118,27 @@ exports.getRecentEatingHistory = (user_id, limit) => {
     });
 };
 
+exports.checkEatingHistoryExists = (userId, yearMonth) => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT DISTINCT DAY(eating_time) as day
+            FROM eating_history
+            WHERE user_id = ? AND eating_time LIKE ?
+            ORDER BY day ASC
+        `;
+        const params = [userId, `${yearMonth}-%`];
+
+        db.query(sql, params, (error, results) => {
+            if (error) {
+                console.error("Error fetching eating history status:", error);
+                return reject(error);
+            }
+            const daysWithRecords = results.map(row => row.day);
+            resolve(daysWithRecords);
+        });
+    });
+};
+
 exports.updateUserName = (user_id, user_name) => {
     return new Promise((resolve, reject) => {
         const sql = 'UPDATE user SET user_name = ? WHERE user_id = ?';

@@ -18,6 +18,7 @@ router.post('/eating_history/recent', verifyToken, userController.getRecentEatin
 router.get('/profile', verifyToken, userController.getProfile);
 router.get('/profile/detail', verifyToken, userController.getDetailedProfile);
 router.get('/calendar/history', verifyToken, userController.getEatingHistoryByDate);
+router.get('/calendar/monthly/days_with_records', verifyToken, userController.getDaysWithRecords);
 
 router.put('/update_info', verifyToken, userController.updateUserInfo);
 router.post('/home/today', verifyToken, userController.getTodaySummary);

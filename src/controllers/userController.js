@@ -255,6 +255,19 @@ exports.getRecentEatingHistory = async (req, res) => {
   }
 };
 
+exports.getDaysWithRecords = async (req, res) => {
+  const userId = req.user.id;
+  const yearMonth = req.body.yearMonth;
+
+  try {
+    const response = await userService.checkEatingHistoryExists(userId, yearMonth);
+    return res.json({msg: 'Successful', daysWithRecords: response});
+  } catch (error) {
+    console.error("Error fetching daysWithRecords:", error);
+    return res.status(500).json({ msg: 'Error fetching daysWithRecords'});
+  }
+}
+
 
 exports.deleteAccount = async (req, res) => {
   const userId = req.user.id;
