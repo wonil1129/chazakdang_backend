@@ -245,10 +245,19 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
           "id": 101,
           "eating_time": "2025-08-23T09:00:00.000Z",
           "food_name": "프로틴바",
-          "health_score": 85
-        }
-      ]
+          "product_image": "uploads/product_images/...",
+          "health_score": 85,
+          "nutrient_list": "...",
+          "review_text": "...",
+          "calories": 200,
+          "protein": 20,
+          "fat": 8,
+          "carbohydrate": 22,
+          "sugar": 5,
+          "sodium": 150
     }
+  ]
+}
 
 식단 기록 상세 조회
 
