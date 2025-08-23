@@ -7,6 +7,7 @@ Chazadang 애플리케이션의 공식 API 문서입니다. 이 가이드는 API
 모든 API 엔드포인트는 다음 기본 URL을 기준으로 합니다.
 
 `https://localhost:3000`
+`https://c1a4832edc2e.ngrok-free.app`
 
 ## 인증
 
