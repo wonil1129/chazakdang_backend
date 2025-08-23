@@ -110,8 +110,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     성공 응답 (200):
 
     {
-      "id": "jaesung",
-      "name": "Jaesung Kang",
+      "id": "UserID",
+      "name": "UserName",
       "profile_image": "uploads/profile_images/image-162987...jpg"
     }
 
@@ -128,10 +128,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     성공 응답 (200):
 
     {
-      "id": "jaesung",
-      "name": "Jaesung Kang",
+      "id": "UserID",
+      "name": "UserName",
       "age": 25,
-      "height": 180,
+      "height": 165,
       "weight": 75,
       "sex": 1,
       "preg": 0,
@@ -151,9 +151,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     Body:
 
     {
-      "user_name": "강재성",
+      "user_name": "UserName",
       "age": 26,
-      "height": 181,
+      "height": 165,
       "weight": 76,
       "sex": 1,
       "preg": 0,
@@ -198,7 +198,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     성공 응답 (200):
 
     {
-      "name": "강재성",
+      "name": "UserName",
       "avg_health_score": 75,
       "totals": {
         "sugar_g": 25,
@@ -263,7 +263,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
     {
       "rating": 5,
-      "review_text": "맛있어요!"
+      "review_text": "Gemini의 해당 음식 분석 text"
     }
 
     성공 응답 (200):
@@ -365,7 +365,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
       ],
       "my_rank": {
         "rank": 15,
-        "user_name": "Jaesung Kang",
+        "user_name": "UserA",
         "profile_image": "...",
         "score": 82
       }
