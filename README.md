@@ -22,7 +22,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ---
 
-## 1. 인증 (`/api/auth`)
+1\. 인증 (`/api/auth`)
 
 사용자 회원가입, 로그인, 아이디 유효성 검사를 처리합니다.
 
