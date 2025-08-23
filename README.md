@@ -38,7 +38,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   {
     "user_id": "newuser",
     "user_pw": "password123",
-    "user_name": "강재성",
+    "user_name": "UserName",
     "age": 25,
     "height": 180,
     "weight": 75,
@@ -84,7 +84,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
       "token": "YOUR_JWT_TOKEN",
       "user": {
         "id": "testuser",
-        "name": "강재성"
+        "name": "UserName"
       }
     }
 
