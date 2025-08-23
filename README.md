@@ -1,4 +1,3 @@
-```
 # Chazadang API 문서
 
 Chazadang 애플리케이션의 공식 API 문서입니다. 이 가이드는 API 엔드포인트와 상호작용하는 데 필요한 모든 정보를 제공합니다.
@@ -23,6 +22,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ---
 
 1\. 인증 (`/api/auth`)
+--------------------
 
 사용자 회원가입, 로그인, 아이디 유효성 검사를 처리합니다.
 
@@ -32,7 +32,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 - **메서드:** `POST`
 - **엔드포인트:** `/api/auth/register`
 - **Body:**
-  ```json
+  ```
   {
     "user_id": "newuser",
     "user_pw": "password123",
@@ -44,8 +44,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "preg": 0,
     "dis": "없음"
   }
-
-```
+  ```
 
 -   **성공 응답 (201):**
 
