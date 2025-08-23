@@ -125,7 +125,7 @@ exports.getRecentEatingHistory = (user_id, limit) => {
         }
 
         const sql = `
-          SELECT id, eating_time, food_name, product_image, health_score, nutrient_list,
+          SELECT id, eating_time, food_name, nutrient_image, health_score, nutrient_list,
                 review_text, calories, protein, fat, carbohydrate, sugar, sodium
           FROM eating_history
           WHERE user_id = ?

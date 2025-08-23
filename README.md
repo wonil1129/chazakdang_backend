@@ -6,19 +6,22 @@ Chazadang 애플리케이션의 공식 API 문서입니다. 이 가이드는 API
 
 모든 API 엔드포인트는 다음 기본 URL을 기준으로 합니다.
 
-`https://localhost:3000`
+`https://localhost:3000` `https://c1a4832edc2e.ngrok-free.app`
 
 ## 인증
 
 대부분의 엔드포인트는 JWT(JSON Web Token)를 사용한 인증이 필요합니다. 요청을 인증하려면 `Authorization` 헤더에 `Bearer YOUR_JWT_TOKEN` 값을 포함해야 합니다.
 
+```
 
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
+```
 
 ---
 
-## 1. 인증 (`/api/auth`)
+1\. 인증 (`/api/auth`)
+--------------------
 
 사용자 회원가입, 로그인, 아이디 유효성 검사를 처리합니다.
 
@@ -28,11 +31,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 - **메서드:** `POST`
 - **엔드포인트:** `/api/auth/register`
 - **Body:**
-  ```json
+  ```
   {
     "user_id": "newuser",
     "user_pw": "password123",
-    "user_name": "강재성",
+    "user_name": "UserName",
     "age": 25,
     "height": 180,
     "weight": 75,
@@ -40,93 +43,115 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "preg": 0,
     "dis": "없음"
   }
+  ```
 
-    성공 응답 (201):
+-   **성공 응답 (201):**
 
+    ```
     {
       "msg": "User registered successfully",
       "token": "YOUR_JWT_TOKEN"
     }
 
-로그인
+    ```
+
+### 로그인
 
 사용자를 인증하고 JWT를 반환합니다.
 
-    메서드: POST
+-   **메서드:**  `POST`
 
-    엔드포인트: /api/auth/login
+-   **엔드포인트:**  `/api/auth/login`
 
-    Body:
+-   **Body:**
 
+    ```
     {
       "user_id": "testuser",
       "user_pw": "password123"
     }
 
-    성공 응답 (200):
+    ```
 
+-   **성공 응답 (200):**
+
+    ```
     {
       "msg": "Login successful",
       "token": "YOUR_JWT_TOKEN",
       "user": {
         "id": "testuser",
-        "name": "강재성"
+        "name": "UserName"
       }
     }
 
-아이디 중복 확인
+    ```
+
+### 아이디 중복 확인
 
 사용자 아이디가 이미 사용 중인지 확인합니다.
 
-    메서드: POST
+-   **메서드:**  `POST`
 
-    엔드포인트: /api/auth/check-id
+-   **엔드포인트:**  `/api/auth/check-id`
 
-    Body:
+-   **Body:**
 
+    ```
     {
       "user_id": "newuser"
     }
 
-    성공 응답 (200):
+    ```
 
+-   **성공 응답 (200):**
+
+    ```
     {
       "msg": "ID is available"
     }
 
-2. 사용자 (/api/users)
+    ```
+
+2\. 사용자 (`/api/users`)
+----------------------
 
 현재 인증된 사용자의 데이터를 관리합니다.
-내 기본 정보 조회
+
+### 내 기본 정보 조회
 
 기본 프로필 정보(아이디, 이름, 이미지)를 조회합니다.
 
-    메서드: GET
+-   **메서드:**  `GET`
 
-    엔드포인트: /api/users/me
+-   **엔드포인트:**  `/api/users/me`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    성공 응답 (200):
+-   **성공 응답 (200):**
 
+    ```
     {
       "id": "UserID",
       "name": "UserName",
       "profile_image": "uploads/profile_images/image-162987...jpg"
     }
 
-내 상세 정보 조회
+    ```
+
+### 내 상세 정보 조회
 
 사용자의 모든 프로필 정보를 조회합니다.
 
-    메서드: GET
+-   **메서드:**  `GET`
 
-    엔드포인트: /api/users/me/profile
+-   **엔드포인트:**  `/api/users/me/profile`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    성공 응답 (200):
+-   **성공 응답 (200):**
 
+    ```
     {
       "id": "UserID",
       "name": "UserName",
@@ -138,18 +163,21 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
       "dis": "없음"
     }
 
-내 프로필 수정
+    ```
+
+### 내 프로필 수정
 
 인증된 사용자의 프로필 정보를 수정합니다.
 
-    메서드: PUT
+-   **메서드:**  `PUT`
 
-    엔드포인트: /api/users/me/profile
+-   **엔드포인트:**  `/api/users/me/profile`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    Body:
+-   **Body:**
 
+    ```
     {
       "user_name": "UserName",
       "age": 26,
@@ -160,43 +188,52 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
       "dis": "알러지"
     }
 
-    성공 응답 (200):
+    ```
 
+-   **성공 응답 (200):**
+
+    ```
     {
       "msg": "User info updated successfully"
     }
 
-프로필 이미지 업로드
+    ```
+
+### 프로필 이미지 업로드
 
 사용자의 프로필 이미지를 업로드하거나 업데이트합니다.
 
-    메서드: POST
+-   **메서드:**  `POST`
 
-    엔드포인트: /api/users/me/image
+-   **엔드포인트:**  `/api/users/me/image`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    Body: multipart/form-data 형식, 필드 이름 image.
+-   **Body:**  `multipart/form-data` 형식, 필드 이름 `image`.
 
-    성공 응답 (200):
+-   **성공 응답 (200):**
 
+    ```
     {
       "msg": "Profile image uploaded successfully",
       "image_url": "uploads/profile_images/image-162987...jpg"
     }
 
-오늘의 요약 조회
+    ```
+
+### 오늘의 요약 조회
 
 사용자의 당일 건강 요약 정보를 조회합니다.
 
-    메서드: GET
+-   **메서드:**  `GET`
 
-    엔드포인트: /api/users/me/today-summary
+-   **엔드포인트:**  `/api/users/me/today-summary`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    성공 응답 (200):
+-   **성공 응답 (200):**
 
+    ```
     {
       "name": "UserName",
       "avg_health_score": 75,
@@ -206,37 +243,45 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
       }
     }
 
-회원 탈퇴
+    ```
+
+### 회원 탈퇴
 
 인증된 사용자의 계정을 삭제합니다.
 
-    메서드: DELETE
+-   **메서드:**  `DELETE`
 
-    엔드포인트: /api/users/me
+-   **엔드포인트:**  `/api/users/me`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    성공 응답 (200):
+-   **성공 응답 (200):**
 
+    ```
     {
       "msg": "Account deleted successfully."
     }
 
-3. 식단 기록 (/api/eating-history)
+    ```
+
+3\. 식단 기록 (`/api/eating-history`)
+---------------------------------
 
 사용자의 음식 섭취 기록을 관리합니다.
-최근 기록 조회
+
+### 최근 기록 조회
 
 가장 최근의 식단 기록을 조회합니다.
 
-    메서드: GET
+-   **메서드:**  `GET`
 
-    엔드포인트: /api/eating-history/recent?limit=3
+-   **엔드포인트:**  `/api/eating-history/recent?limit=3`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    성공 응답 (200):
+-   **성공 응답 (200):**
 
+    ```
     {
       "msg": "Successfully fetched recent eating history",
       "recentEatingHistory": [
@@ -244,23 +289,35 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
           "id": 101,
           "eating_time": "2025-08-23T09:00:00.000Z",
           "food_name": "프로틴바",
-          "health_score": 85
+          "product_image": "uploads/product_images/...",
+          "health_score": 85,
+          "nutrient_list": "...",
+          "review_text": "...",
+          "calories": 200,
+          "protein": 20,
+          "fat": 8,
+          "carbohydrate": 22,
+          "sugar": 5,
+          "sodium": 150
         }
       ]
     }
 
-식단 기록 상세 조회
+    ```
+
+### 식단 기록 상세 조회
 
 ID로 특정 식단 기록의 모든 정보를 조회합니다.
 
-    메서드: GET
+-   **메서드:**  `GET`
 
-    엔드포인트: /api/eating-history/:id
+-   **엔드포인트:**  `/api/eating-history/:id`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    성공 응답 (200):
+-   **성공 응답 (200):**
 
+    ```
     {
       "id": 79,
       "eating_time": "2025-08-22T12:30:00.000Z",
@@ -277,43 +334,52 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
       "sodium": 20
     }
 
-기록 수정
+    ```
+
+### 기록 수정
 
 특정 식단 기록을 수정합니다.
 
-    메서드: PATCH
+-   **메서드:**  `PATCH`
 
-    엔드포인트: /api/eating-history/:id
+-   **엔드포인트:**  `/api/eating-history/:id`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    Body:
+-   **Body:**
 
+    ```
     {
       "rating": 5,
       "review_text": "Gemini의 해당 음식 분석 text"
     }
 
-    성공 응답 (200):
+    ```
 
+-   **성공 응답 (200):**
+
+    ```
     {
       "msg": "Successfully updated eating history"
     }
 
-제품 이미지 분석 요청
+    ```
+
+### 제품 이미지 분석 요청
 
 분석할 제품의 영양성분표 이미지를 업로드합니다.
 
-    메서드: POST
+-   **메서드:**  `POST`
 
-    엔드포인트: /api/eating-history/product-image
+-   **엔드포인트:**  `/api/eating-history/product-image`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    Body: multipart/form-data 형식, 필드 이름 image.
+-   **Body:**  `multipart/form-data` 형식, 필드 이름 `image`.
 
-    성공 응답 (200):
+-   **성공 응답 (200):**
 
+    ```
     {
       "msg": "Nutrients image uploaded successfully",
       "analyzeResult": { "...": "..." },
@@ -321,27 +387,35 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
       "health_score": 78
     }
 
-4. 캘린더 (/api/calendar)
+    ```
+
+4\. 캘린더 (`/api/calendar`)
+-------------------------
 
 캘린더 기반으로 식단 기록을 조회합니다.
-특정 날짜 기록 조회
+
+### 특정 날짜 기록 조회
 
 지정된 날짜의 모든 식단 기록을 조회합니다.
 
-    메서드: POST
+-   **메서드:**  `POST`
 
-    엔드포인트: /api/calendar/date
+-   **엔드포인트:**  `/api/calendar/date`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    Body:
+-   **Body:**
 
+    ```
     {
       "date": "2025-08-22"
     }
 
-    성공 응답 (200):
+    ```
 
+-   **성공 응답 (200):**
+
+    ```
     [
       {
         "eating_time": "2025-08-22T12:30:00.000Z",
@@ -351,37 +425,45 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
       }
     ]
 
-월별 기록 현황 조회
+    ```
+
+### 월별 기록 현황 조회
 
 주어진 월에 식단 기록이 있는 날짜들을 조회합니다.
 
-    메서드: GET
+-   **메서드:**  `GET`
 
-    엔드포인트: /api/calendar/status?month=2025-08
+-   **엔드포인트:**  `/api/calendar/status?month=2025-08`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    성공 응답 (200):
+-   **성공 응답 (200):**
 
+    ```
     {
       "days_with_records": [9, 11, 12, 13, 22]
     }
 
-5. 랭킹 (/api/rankings)
+    ```
+
+5\. 랭킹 (`/api/rankings`)
+------------------------
 
 건강 점수 기반의 사용자 랭킹을 제공합니다.
-기간별 랭킹 조회
+
+### 기간별 랭킹 조회
 
 주어진 기간(일간/주간/월간)의 상위 10명과 현재 사용자의 랭킹을 조회합니다.
 
-    메서드: GET
+-   **메서드:**  `GET`
 
-    엔드포인트: /api/rankings?period=daily (또는 weekly, monthly)
+-   **엔드포인트:**  `/api/rankings?period=daily` (또는 `weekly`, `monthly`)
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    성공 응답 (200):
+-   **성공 응답 (200):**
 
+    ```
     {
       "top_10": [
         {
@@ -399,19 +481,24 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
       }
     }
 
-6. 게시판 (/api/posts)
+    ```
+
+6\. 게시판 (`/api/posts`)
+----------------------
 
 커뮤니티 게시판의 게시글과 댓글을 관리합니다.
-게시글 목록 조회
+
+### 게시글 목록 조회
 
 페이지별로 게시글 목록을 조회합니다.
 
-    메서드: GET
+-   **메서드:**  `GET`
 
-    엔드포인트: /api/posts?page=1
+-   **엔드포인트:**  `/api/posts?page=1`
 
-    성공 응답 (200):
+-   **성공 응답 (200):**
 
+    ```
     [
       {
         "post_id": 1,
@@ -421,16 +508,19 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
       }
     ]
 
-게시글 상세 조회
+    ```
+
+### 게시글 상세 조회
 
 단일 게시글과 해당 글의 댓글들을 조회합니다.
 
-    메서드: GET
+-   **메서드:**  `GET`
 
-    엔드포인트: /api/posts/:id
+-   **엔드포인트:**  `/api/posts/:id`
 
-    성공 응답 (200):
+-   **성공 응답 (200):**
 
+    ```
     {
       "post": {
         "title": "첫 번째 게시글",
@@ -445,88 +535,110 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
       ]
     }
 
-게시글 작성
+    ```
+
+### 게시글 작성
 
 새로운 게시글을 작성합니다.
 
-    메서드: POST
+-   **메서드:**  `POST`
 
-    엔드포인트: /api/posts
+-   **엔드포인트:**  `/api/posts`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    Body:
+-   **Body:**
 
+    ```
     {
       "title": "새로운 글 제목",
       "content": "새로운 글 내용입니다."
     }
 
-    성공 응답 (201):
+    ```
 
+-   **성공 응답 (201):**
+
+    ```
     {
       "msg": "게시글이 등록되었습니다."
     }
 
-게시글 수정
+    ```
+
+### 게시글 수정
 
 기존 게시글을 수정합니다.
 
-    메서드: PUT
+-   **메서드:**  `PUT`
 
-    엔드포인트: /api/posts/:id
+-   **엔드포인트:**  `/api/posts/:id`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    Body:
+-   **Body:**
 
+    ```
     {
       "title": "수정된 글 제목",
       "content": "수정된 글 내용입니다."
     }
 
-    성공 응답 (200):
+    ```
 
+-   **성공 응답 (200):**
+
+    ```
     {
       "msg": "게시글이 수정되었습니다."
     }
 
-게시글 삭제
+    ```
+
+### 게시글 삭제
 
 게시글을 삭제합니다.
 
-    메서드: DELETE
+-   **메서드:**  `DELETE`
 
-    엔드포인트: /api/posts/:id
+-   **엔드포인트:**  `/api/posts/:id`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    성공 응답 (200):
+-   **성공 응답 (200):**
 
+    ```
     {
       "msg": "게시글이 삭제되었습니다."
     }
 
-댓글 작성
+    ```
+
+### 댓글 작성
 
 게시글에 댓글을 추가합니다.
 
-    메서드: POST
+-   **메서드:**  `POST`
 
-    엔드포인트: /api/posts/:id/comments
+-   **엔드포인트:**  `/api/posts/:id/comments`
 
-    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
-    Body:
+-   **Body:**
 
+    ```
     {
       "content": "댓글 내용입니다."
     }
 
-    성공 응답 (201):
+    ```
 
+-   **성공 응답 (201):**
+
+    ```
     {
       "msg": "Comment created successfully",
       "commentId": 123
     }
 
+    ```

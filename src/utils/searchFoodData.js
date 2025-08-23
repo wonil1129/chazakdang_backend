@@ -43,19 +43,19 @@ exports.getFoodDataFromProductID = async (nutrientData) => {
                 const food_weight = row['식품중량'];
                 console.log("DB에서 가져온 row: ", row);
 
-                resolve({
+                return resolve({
                     ...nutrientData,
-                    food_name: row['식품명'] || nutrientData.food_name,
-                    calories: recalculate_value(row['에너지_kcal'], food_weight) || nutrientData.calories,
-                    protein: recalculate_value(row['단백질_g'], food_weight) || nutrientData.protein,
-                    fat: recalculate_value(row['지방_g'], food_weight) || nutrientData.fat,
-                    carbohydrate: recalculate_value(row['탄수화물_g'], food_weight) || nutrientData.carbohydrate,
-                    sugar: recalculate_value(row['당류_g'], food_weight) || nutrientData.sugar,
-                    sodium: recalculate_value(row['나트륨_mg'], food_weight) || nutrientData.sodium,
-                    cholesterol: recalculate_value(row['콜레스테롤_mg'], food_weight) || nutrientData.cholesterol,
-                    saturated_fat: recalculate_value(row['포화지방산_g'], food_weight) || nutrientData.saturated_fat,
-                    trans_fat: recalculate_value(row['트랜스지방산_g'], food_weight) || nutrientData.trans_fat,
-                    food_weight: row['식품중량'] || nutrientData.food_weight,
+                    food_name: row['식품명'] ?? nutrientData.food_name,
+                    calories: recalculate_value(row['에너지_kcal'], food_weight) ?? nutrientData.calories,
+                    protein: recalculate_value(row['단백질_g'], food_weight) ?? nutrientData.protein,
+                    fat: recalculate_value(row['지방_g'], food_weight) ?? nutrientData.fat,
+                    carbohydrate: recalculate_value(row['탄수화물_g'], food_weight) ?? nutrientData.carbohydrate,
+                    sugar: recalculate_value(row['당류_g'], food_weight) ?? nutrientData.sugar,
+                    sodium: recalculate_value(row['나트륨_mg'], food_weight) ?? nutrientData.sodium,
+                    cholesterol: recalculate_value(row['콜레스테롤_mg'], food_weight) ?? nutrientData.cholesterol,
+                    saturated_fat: recalculate_value(row['포화지방산_g'], food_weight) ?? nutrientData.saturated_fat,
+                    trans_fat: recalculate_value(row['트랜스지방산_g'], food_weight) ?? nutrientData.trans_fat,
+                    food_weight: row['식품중량'] ?? nutrientData.food_weight,
                 });
             });
         });
