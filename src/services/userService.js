@@ -81,8 +81,22 @@ exports.getEatingHistoryByIdAndDate = (user_id, date) => {
         db.query(sql, [user_id, date], (err, results) => {
             if (err) return reject(err);
             resolve(results);
-        })
-    })
+        });
+    });
+};
+
+exports.getEatingHistoryByFoodId = (userId, foodId) => {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT eating_time, food_name, product_image, health_score, nutrient_list, review_text, calories, protein, fat, carbohydrate, sugar, sodium
+            FROM eating_history
+            WHERE user_id = ? AND id = ?
+        `;
+        db.query(sql, [userId, foodId], (err, results) => {
+            if (err) return reject(err);
+            resolve(results[0] || null);
+        });
+    });
 };
 
 exports.getTodaySummary = (user_id) => {

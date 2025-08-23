@@ -249,6 +249,34 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
       ]
     }
 
+식단 기록 상세 조회
+
+ID로 특정 식단 기록의 모든 정보를 조회합니다.
+
+    메서드: GET
+
+    엔드포인트: /api/eating-history/:id
+
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
+
+    성공 응답 (200):
+
+    {
+      "id": 79,
+      "eating_time": "2025-08-22T12:30:00.000Z",
+      "food_name": "제로 콜라",
+      "product_image": "...",
+      "health_score": 90,
+      "nutrient_list": "...",
+      "review_text": "...",
+      "calories": 0,
+      "protein": 0,
+      "fat": 0,
+      "carbohydrate": 0,
+      "sugar": 0,
+      "sodium": 20
+    }
+
 기록 수정
 
 특정 식단 기록을 수정합니다.

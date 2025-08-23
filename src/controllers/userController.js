@@ -254,6 +254,22 @@ exports.getRecentEatingHistory = async (req, res) => {
   }
 };
 
+exports.getEatingHistoryById = async (req, res) => {
+  const userId = req.user.id;
+  const foodId = req.params.id;
+
+  try {
+    const eatingHistory = await userService.getEatingHistoryByFoodId(userId, foodId);
+    if (!eatingHistory) {
+      return res.status(404).json({ msg: 'No recent eating history found' });
+    }
+    return res.json(eatingHistory);
+  } catch (error) {
+    console.error('Error fetching eating history by food id:', error);
+    return res.status(500).json({ msg: 'Error fetching eating history '});
+  }
+}
+
 // Edit a specific eating history record
 exports.editEatingHistory = async (req, res) => { // CHANGED: Renamed function to camelCase
   const userId = req.user.id;
