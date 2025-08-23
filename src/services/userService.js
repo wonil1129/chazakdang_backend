@@ -71,7 +71,7 @@ exports.checkDuplicateId = (user_id) => {
 };
 
 exports.getEatingHistoryByIdAndDate = (user_id, date) => {
-    return new Promise((resolve, reject) => { 
+    return new Promise((resolve, reject) => {
         const sql = `
           SELECT eating_time, food_name, product_image, health_score, nutrient_list, review_text, calories, protein, fat, carbohydrate, sugar, sodium
           FROM eating_history
@@ -104,6 +104,12 @@ exports.getTodaySummary = (user_id) => {
 
 exports.getRecentEatingHistory = (user_id, limit) => {
     return new Promise((resolve, reject) => {
+        const recordLimit = parseInt(limit, 10);
+
+        if (isNaN(recordLimit) || recordLimit <= 0) {
+            return reject(new Error('Invalid limit parameter provided'));
+        }
+
         const sql = `
           SELECT id, eating_time, food_name, health_score
           FROM eating_history
@@ -111,7 +117,7 @@ exports.getRecentEatingHistory = (user_id, limit) => {
           ORDER BY eating_time DESC
           LIMIT ?
         `;
-        db.query(sql, [user_id, limit], (err, results) => {
+        db.query(sql, [user_id, recordLimit], (err, results) => {
             if (err) return reject(err);
             resolve(results);
         });
@@ -123,7 +129,7 @@ exports.editEatingHistory = (userId, foodId, data) => {
         if (!data || typeof data !== 'object') {
             return reject(new Error("Invalid update data provided"));
         }
-        
+
         const allowedColumns = [
             'health_score', 'eating_time', 'food_name', 'calories',
             'protein', 'fat', 'carbohydrate', 'sugar', 'sodium',
@@ -143,7 +149,7 @@ exports.editEatingHistory = (userId, foodId, data) => {
         });
 
         if (setClauses.length === 0) {
-            return resolve({ msg: "No valid fields provided to update." });
+            return resolve({ message: "No valid fields provided to update.", changedRows: 0 });
         }
 
         params.push(foodId);
@@ -181,7 +187,7 @@ exports.checkEatingHistoryExists = (userId, yearMonth) => {
                 return reject(error);
             }
             const daysWithRecords = results.map(row => row.day);
-            resolve(daysWithRecords);
+            resolve({ days_with_records: daysWithRecords });
         });
     });
 };
@@ -223,8 +229,8 @@ exports.updateUserInfo = (user_id, age, height, weight, sex, preg, dis ) => {
         }
 
         const sql = `
-          UPDATE user_info 
-          SET age = ?, height = ?, weight = ?, sex = ?, preg = ?, dis = ? 
+          UPDATE user_info
+          SET age = ?, height = ?, weight = ?, sex = ?, preg = ?, dis = ?
           WHERE user_id = ?
           `;
         db.query(sql, [age, height, weight, sex, preg, dis, user_id], (err, result) => {

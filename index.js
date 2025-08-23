@@ -4,17 +4,23 @@ const http = require('http');
 const fs = require('fs');
 
 const app = express();
+
+const authRoutes = require('./src/routes/authRoutes');
 const userRoutes = require('./src/routes/userRoutes');
+const eatingHistoryRoutes = require('./src/routes/eatingHistoryRoutes');
+const calendarRoutes = require('./src/routes/calendarRoutes');
 const rankingRoutes = require('./src/routes/rankingRoutes');
-// const boardRoutes = require('./src/routes/boardRoutes');
+// const postsRoutes = require('./src/routes/boardRoutes');
 
 app.use(express.json());
-
 app.use('/uploads', express.static('uploads'));
 
-app.use('/api/user', userRoutes);
-app.use('/api/ranking', rankingRoutes);
-// app.use('/api/board', boardRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/eating-history', eatingHistoryRoutes);
+app.use('/api/calendar', calendarRoutes);
+app.use('/api/rankings', rankingRoutes);
+// app.use('/api/posts', postsRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

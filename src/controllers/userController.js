@@ -78,7 +78,7 @@ exports.login = async (req, res) => {
     }
 };
 
-// Get user profile
+// Get user profile (basic info)
 exports.getProfile = async (req, res) => {
     const userId = req.user.id;
 
@@ -117,7 +117,7 @@ exports.getTodaySummary = async (req, res) => {
 };
 
 exports.uploadProfileImage = async (req, res) => {
-  const user_id = req.user.id; // JWT에서 추출한 user ID
+  const user_id = req.user.id;
   const imagePath = `uploads/profile_images/${req.file.filename}`;
 
   try {
@@ -136,8 +136,7 @@ exports.uploadNutrientsImage = async (req, res) => {
   try {
     const userInfo = await userService.getUserDetailedInfo(req.user.id);
     let nutrientData = await nutrientService.analyzeNutrients(req.file.path, userInfo);
-    // const product_image = await productService.fetchProductImage(nutrientData.food_name) || 'uploads/product_images/placeholder.jpg';
-    const product_image = 'uploads/product_images/placeholder.jpg'; // Placeholder for product image
+    const product_image = 'uploads/product_images/placeholder.jpg';
     try {
       nutrientData = await searchFoodData.getFoodDataFromProductID(nutrientData);
     } catch (error) {
@@ -165,9 +164,7 @@ exports.uploadNutrientsImage = async (req, res) => {
     res.json({
       msg: 'Nutrients image uploaded successfully',
       analyzeResult: nutrientData,
-      // coupang: product_image.includes('placeholder') ? { msg: 'No product image found' } : product_image,
       coupang: nutrient_image.includes('placeholder') ? { msg: 'No product image found' } : nutrient_image,
-      // health_score: prediction.predicted_value || 'NaN',
       health_score: prediction.predicted_value || 'NaN',
     });
 
@@ -176,7 +173,6 @@ exports.uploadNutrientsImage = async (req, res) => {
       product_image,
       nutrient_image,
       health_score: prediction.predicted_value || -1,
-      // health_score: prediction.score || '-1',
     });
 
     try {
@@ -195,7 +191,7 @@ exports.uploadNutrientsImage = async (req, res) => {
 };
 
 
-// Get detailed user info for calendar
+// Get detailed user info
 exports.getDetailedProfile = async (req, res) => {
   const userId = req.user.id;
 
@@ -220,19 +216,20 @@ exports.getDetailedProfile = async (req, res) => {
   }
 };
 
-// 특정 날짜의 섭취 기록 조회
+// Get eating history for a specific date
 exports.getEatingHistoryByDate = async (req, res) => {
   const userId = req.user.id;
-  const { date } = req.query; // YYYY-MM-DD 형태로 프론트에서 넘김
+  const { date } = req.body; // CHANGED: Data is now from the request body for POST requests
 
   if (!date) return res.status(400).json({ msg: 'Date is required' });
 
   try {
     const eatingHistory = await userService.getEatingHistoryByIdAndDate(userId, date);
     if (!eatingHistory || eatingHistory.length === 0) {
-      return res.status(404).json({ msg: 'No eating history found for this date' });
+      // Return an empty array instead of an error for dates with no records
+      return res.json([]);
     }
-    res.json({ date, records: eatingHistory });
+    res.json(eatingHistory); // CHANGED: Return only the array of records as per API doc
   } catch (error) {
     console.error('Error fetching eating history:', error);
     return res.status(500).json({ msg: 'Error fetching eating history' });
@@ -240,9 +237,10 @@ exports.getEatingHistoryByDate = async (req, res) => {
 };
 
 
+// Get recent eating history
 exports.getRecentEatingHistory = async (req, res) => {
   const userId = req.user.id;
-  const limit = req.body.limit;
+  const limit = req.query.limit || 3; // CHANGED: Limit is now from query params for GET requests
 
   try {
     const recentEatingHistory = await userService.getRecentEatingHistory(userId, limit);
@@ -256,27 +254,37 @@ exports.getRecentEatingHistory = async (req, res) => {
   }
 };
 
-exports.editEating_history = async (req, res) => {
+// Edit a specific eating history record
+exports.editEatingHistory = async (req, res) => { // CHANGED: Renamed function to camelCase
   const userId = req.user.id;
-  const foodId = req.body.food_id;
-  const data = req.body.data;
+  const foodId = req.params.id; // Get ID from URL parameter
+  const dataToUpdate = req.body; // Update data is the request body
 
   try {
-    const results = userService.editEatingHistory(userId, foodId, data);
+    const results = await userService.editEatingHistory(userId, foodId, dataToUpdate);
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ msg: "Record not found or user not authorized to edit"});
+    }
     return res.json({ msg: "Successfully updated eating history"});
   } catch (error) {
-    console.error("Error updating eating history");
+    console.error("Error updating eating history:", error);
+    return res.status(500).json({ msg: "An error occurred on the server." });
   }
 }
 
-
+// Get which days in a month have records
 exports.getDaysWithRecords = async (req, res) => {
   const userId = req.user.id;
-  const yearMonth = req.body.yearMonth;
+  const yearMonth = req.query.month; // CHANGED: Month is now from query params for GET requests
+
+  if (!yearMonth) {
+    return res.status(400).json({ msg: 'Month parameter (YYYY-MM) is required.' });
+  }
 
   try {
     const response = await userService.checkEatingHistoryExists(userId, yearMonth);
-    return res.json({msg: 'Successful', daysWithRecords: response});
+    // The service returns { days_with_records: [...] }, we just need to forward that.
+    return res.json(response); // CHANGED: Simplified response to match API doc { "days_with_records": [...] }
   } catch (error) {
     console.error("Error fetching daysWithRecords:", error);
     return res.status(500).json({ msg: 'Error fetching daysWithRecords'});
@@ -300,7 +308,7 @@ exports.updateUserInfo = async (req, res) => {
   const user_id = req.user.id;
   const { user_name, age, height, weight, sex, preg, dis } = req.body;
 
-  if (!user_name || !age || !height || !weight || !sex || !preg) {
+  if (!user_name || !age || !height || !weight || sex === undefined || preg === undefined) {
     return res.status(400).json({ msg: 'All fields except disease are required' });
   }
 

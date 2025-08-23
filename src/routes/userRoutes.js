@@ -4,24 +4,22 @@ const userController = require('../controllers/userController');
 const { verifyToken } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
-// public routes
-router.post('/register', userController.register);
-router.post('/login', userController.login);
-router.post('/upload_profile_image', verifyToken, upload.single('image'), userController.uploadProfileImage);
-router.post('/upload_nutrients_image', verifyToken, upload.single('image'), userController.uploadNutrientsImage);
-router.post('/delete_account', verifyToken, userController.deleteAccount);
-router.post('/check_id', userController.checkDuplicateId);
-router.post('/eating_history/recent', verifyToken, userController.getRecentEatingHistory);
-router.post('/eating_history/edit', verifyToken, userController.editEating_history)
-router.post('/calendar/monthly/days_with_records', verifyToken, userController.getDaysWithRecords);
+// GET /api/users/me -> Get basic user info (id, name, image)
+router.get('/me', verifyToken, userController.getProfile);
 
+// GET /api/users/me/profile -> Get detailed user info
+router.get('/me/profile', verifyToken, userController.getDetailedProfile);
 
-// protected routes
-router.get('/profile', verifyToken, userController.getProfile);
-router.get('/profile/detail', verifyToken, userController.getDetailedProfile);
-router.get('/calendar/history', verifyToken, userController.getEatingHistoryByDate);
+// PUT /api/users/me/profile -> Update user info
+router.put('/me/profile', verifyToken, userController.updateUserInfo);
 
-router.put('/update_info', verifyToken, userController.updateUserInfo);
-router.post('/home/today', verifyToken, userController.getTodaySummary);
+// DELETE /api/users/me -> Delete user account
+router.delete('/me', verifyToken, userController.deleteAccount);
+
+// POST /api/users/me/image -> Upload profile image
+router.post('/me/image', verifyToken, upload.single('image'), userController.uploadProfileImage);
+
+// GET /api/users/me/today-summary -> Get today's summary
+router.get('/me/today-summary', verifyToken, userController.getTodaySummary);
 
 module.exports = router;
