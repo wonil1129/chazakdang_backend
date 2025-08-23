@@ -1,16 +1,16 @@
-# Chazadang API Documentation
+# Chazadang API 문서
 
-Welcome to the official API documentation for the Chazadang application. This guide provides all the information you need to interact with the API endpoints.
+Chazadang 애플리케이션의 공식 API 문서입니다. 이 가이드는 API 엔드포인트와 상호작용하는 데 필요한 모든 정보를 제공합니다.
 
-## Base URL
+## 기본 URL
 
-All API endpoints are relative to the following base URL:
+모든 API 엔드포인트는 다음 기본 URL을 기준으로 합니다.
 
 `https://localhost:3000`
 
-## Authentication
+## 인증
 
-Most endpoints require authentication using a JSON Web Token (JWT). To authenticate your requests, include an `Authorization` header with the value `Bearer YOUR_JWT_TOKEN`.
+대부분의 엔드포인트는 JWT(JSON Web Token)를 사용한 인증이 필요합니다. 요청을 인증하려면 `Authorization` 헤더에 `Bearer YOUR_JWT_TOKEN` 값을 포함해야 합니다.
 
 
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -18,15 +18,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ---
 
-## 1. Authentication (`/api/auth`)
+## 1. 인증 (`/api/auth`)
 
-Handles user registration, login, and ID validation.
+사용자 회원가입, 로그인, 아이디 유효성 검사를 처리합니다.
 
-### Register
-Creates a new user account.
+### 회원가입
+새로운 사용자 계정을 생성합니다.
 
-- **Method:** `POST`
-- **Endpoint:** `/api/auth/register`
+- **메서드:** `POST`
+- **엔드포인트:** `/api/auth/register`
 - **Body:**
   ```json
   {
@@ -41,20 +41,20 @@ Creates a new user account.
     "dis": "없음"
   }
 
-    Success Response (201):
+    성공 응답 (201):
 
     {
       "msg": "User registered successfully",
       "token": "YOUR_JWT_TOKEN"
     }
 
-Login
+로그인
 
-Authenticates a user and returns a JWT.
+사용자를 인증하고 JWT를 반환합니다.
 
-    Method: POST
+    메서드: POST
 
-    Endpoint: /api/auth/login
+    엔드포인트: /api/auth/login
 
     Body:
 
@@ -63,7 +63,7 @@ Authenticates a user and returns a JWT.
       "user_pw": "password123"
     }
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "msg": "Login successful",
@@ -74,13 +74,13 @@ Authenticates a user and returns a JWT.
       }
     }
 
-Check ID Availability
+아이디 중복 확인
 
-Checks if a user ID is already taken.
+사용자 아이디가 이미 사용 중인지 확인합니다.
 
-    Method: POST
+    메서드: POST
 
-    Endpoint: /api/auth/check-id
+    엔드포인트: /api/auth/check-id
 
     Body:
 
@@ -88,26 +88,26 @@ Checks if a user ID is already taken.
       "user_id": "newuser"
     }
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "msg": "ID is available"
     }
 
-2. Users (/api/users)
+2. 사용자 (/api/users)
 
-Manages the currently authenticated user's data.
-Get My Basic Info
+현재 인증된 사용자의 데이터를 관리합니다.
+내 기본 정보 조회
 
-Retrieves basic profile information (ID, name, image).
+기본 프로필 정보(아이디, 이름, 이미지)를 조회합니다.
 
-    Method: GET
+    메서드: GET
 
-    Endpoint: /api/users/me
+    엔드포인트: /api/users/me
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "id": "jaesung",
@@ -115,17 +115,17 @@ Retrieves basic profile information (ID, name, image).
       "profile_image": "uploads/profile_images/image-162987...jpg"
     }
 
-Get My Detailed Profile
+내 상세 정보 조회
 
-Retrieves all profile information for the user.
+사용자의 모든 프로필 정보를 조회합니다.
 
-    Method: GET
+    메서드: GET
 
-    Endpoint: /api/users/me/profile
+    엔드포인트: /api/users/me/profile
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "id": "jaesung",
@@ -138,15 +138,15 @@ Retrieves all profile information for the user.
       "dis": "없음"
     }
 
-Update My Profile
+내 프로필 수정
 
-Updates the authenticated user's profile information.
+인증된 사용자의 프로필 정보를 수정합니다.
 
-    Method: PUT
+    메서드: PUT
 
-    Endpoint: /api/users/me/profile
+    엔드포인트: /api/users/me/profile
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
     Body:
 
@@ -160,42 +160,42 @@ Updates the authenticated user's profile information.
       "dis": "알러지"
     }
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "msg": "User info updated successfully"
     }
 
-Upload Profile Image
+프로필 이미지 업로드
 
-Uploads or updates the user's profile image.
+사용자의 프로필 이미지를 업로드하거나 업데이트합니다.
 
-    Method: POST
+    메서드: POST
 
-    Endpoint: /api/users/me/image
+    엔드포인트: /api/users/me/image
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
-    Body: multipart/form-data with a field named image.
+    Body: multipart/form-data 형식, 필드 이름 image.
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "msg": "Profile image uploaded successfully",
       "image_url": "uploads/profile_images/image-162987...jpg"
     }
 
-Get Today's Summary
+오늘의 요약 조회
 
-Retrieves the user's health summary for the current day.
+사용자의 당일 건강 요약 정보를 조회합니다.
 
-    Method: GET
+    메서드: GET
 
-    Endpoint: /api/users/me/today-summary
+    엔드포인트: /api/users/me/today-summary
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "name": "강재성",
@@ -206,36 +206,36 @@ Retrieves the user's health summary for the current day.
       }
     }
 
-Delete Account
+회원 탈퇴
 
-Deletes the authenticated user's account.
+인증된 사용자의 계정을 삭제합니다.
 
-    Method: DELETE
+    메서드: DELETE
 
-    Endpoint: /api/users/me
+    엔드포인트: /api/users/me
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "msg": "Account deleted successfully."
     }
 
-3. Eating History (/api/eating-history)
+3. 식단 기록 (/api/eating-history)
 
-Manages user's food consumption records.
-Get Recent History
+사용자의 음식 섭취 기록을 관리합니다.
+최근 기록 조회
 
-Retrieves the most recent eating history records.
+가장 최근의 식단 기록을 조회합니다.
 
-    Method: GET
+    메서드: GET
 
-    Endpoint: /api/eating-history/recent?limit=3
+    엔드포인트: /api/eating-history/recent?limit=3
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "msg": "Successfully fetched recent eating history",
@@ -249,15 +249,15 @@ Retrieves the most recent eating history records.
       ]
     }
 
-Update History Record
+기록 수정
 
-Updates a specific eating history record.
+특정 식단 기록을 수정합니다.
 
-    Method: PATCH
+    메서드: PATCH
 
-    Endpoint: /api/eating-history/:id
+    엔드포인트: /api/eating-history/:id
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
     Body:
 
@@ -266,25 +266,25 @@ Updates a specific eating history record.
       "review_text": "맛있어요!"
     }
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "msg": "Successfully updated eating history"
     }
 
-Upload Product Image for Analysis
+제품 이미지 분석 요청
 
-Uploads a product's nutrient information image for analysis.
+분석할 제품의 영양성분표 이미지를 업로드합니다.
 
-    Method: POST
+    메서드: POST
 
-    Endpoint: /api/eating-history/product-image
+    엔드포인트: /api/eating-history/product-image
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
-    Body: multipart/form-data with a field named image.
+    Body: multipart/form-data 형식, 필드 이름 image.
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "msg": "Nutrients image uploaded successfully",
@@ -293,18 +293,18 @@ Uploads a product's nutrient information image for analysis.
       "health_score": 78
     }
 
-4. Calendar (/api/calendar)
+4. 캘린더 (/api/calendar)
 
-Provides calendar-based views of eating history.
-Get History by Date
+캘린더 기반으로 식단 기록을 조회합니다.
+특정 날짜 기록 조회
 
-Retrieves all eating history records for a specific date.
+지정된 날짜의 모든 식단 기록을 조회합니다.
 
-    Method: POST
+    메서드: POST
 
-    Endpoint: /api/calendar/date
+    엔드포인트: /api/calendar/date
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
     Body:
 
@@ -312,7 +312,7 @@ Retrieves all eating history records for a specific date.
       "date": "2025-08-22"
     }
 
-    Success Response (200):
+    성공 응답 (200):
 
     [
       {
@@ -323,36 +323,36 @@ Retrieves all eating history records for a specific date.
       }
     ]
 
-Get Monthly Status
+월별 기록 현황 조회
 
-Retrieves which days in a given month have eating records.
+주어진 월에 식단 기록이 있는 날짜들을 조회합니다.
 
-    Method: GET
+    메서드: GET
 
-    Endpoint: /api/calendar/status?month=2025-08
+    엔드포인트: /api/calendar/status?month=2025-08
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "days_with_records": [9, 11, 12, 13, 22]
     }
 
-5. Rankings (/api/rankings)
+5. 랭킹 (/api/rankings)
 
-Provides user rankings based on health scores.
-Get Rankings by Period
+건강 점수 기반의 사용자 랭킹을 제공합니다.
+기간별 랭킹 조회
 
-Retrieves the top 10 users and the current user's rank for a given period.
+주어진 기간(일간/주간/월간)의 상위 10명과 현재 사용자의 랭킹을 조회합니다.
 
-    Method: GET
+    메서드: GET
 
-    Endpoint: /api/rankings?period=daily (or weekly, monthly)
+    엔드포인트: /api/rankings?period=daily (또는 weekly, monthly)
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "top_10": [
@@ -371,18 +371,18 @@ Retrieves the top 10 users and the current user's rank for a given period.
       }
     }
 
-6. Posts (/api/posts)
+6. 게시판 (/api/posts)
 
-Manages the community board posts and comments.
-List Posts
+커뮤니티 게시판의 게시글과 댓글을 관리합니다.
+게시글 목록 조회
 
-Retrieves a paginated list of posts.
+페이지별로 게시글 목록을 조회합니다.
 
-    Method: GET
+    메서드: GET
 
-    Endpoint: /api/posts?page=1
+    엔드포인트: /api/posts?page=1
 
-    Success Response (200):
+    성공 응답 (200):
 
     [
       {
@@ -393,15 +393,15 @@ Retrieves a paginated list of posts.
       }
     ]
 
-Get Post Detail
+게시글 상세 조회
 
-Retrieves a single post and its comments.
+단일 게시글과 해당 글의 댓글들을 조회합니다.
 
-    Method: GET
+    메서드: GET
 
-    Endpoint: /api/posts/:id
+    엔드포인트: /api/posts/:id
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "post": {
@@ -417,15 +417,15 @@ Retrieves a single post and its comments.
       ]
     }
 
-Create Post
+게시글 작성
 
-Creates a new post.
+새로운 게시글을 작성합니다.
 
-    Method: POST
+    메서드: POST
 
-    Endpoint: /api/posts
+    엔드포인트: /api/posts
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
     Body:
 
@@ -434,21 +434,21 @@ Creates a new post.
       "content": "새로운 글 내용입니다."
     }
 
-    Success Response (201):
+    성공 응답 (201):
 
     {
       "msg": "게시글이 등록되었습니다."
     }
 
-Update Post
+게시글 수정
 
-Updates an existing post.
+기존 게시글을 수정합니다.
 
-    Method: PUT
+    메서드: PUT
 
-    Endpoint: /api/posts/:id
+    엔드포인트: /api/posts/:id
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
     Body:
 
@@ -457,37 +457,37 @@ Updates an existing post.
       "content": "수정된 글 내용입니다."
     }
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "msg": "게시글이 수정되었습니다."
     }
 
-Delete Post
+게시글 삭제
 
-Deletes a post.
+게시글을 삭제합니다.
 
-    Method: DELETE
+    메서드: DELETE
 
-    Endpoint: /api/posts/:id
+    엔드포인트: /api/posts/:id
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
-    Success Response (200):
+    성공 응답 (200):
 
     {
       "msg": "게시글이 삭제되었습니다."
     }
 
-Create Comment
+댓글 작성
 
-Adds a comment to a post.
+게시글에 댓글을 추가합니다.
 
-    Method: POST
+    메서드: POST
 
-    Endpoint: /api/posts/:id/comments
+    엔드포인트: /api/posts/:id/comments
 
-    Headers: Authorization: Bearer YOUR_JWT_TOKEN
+    헤더: Authorization: Bearer YOUR_JWT_TOKEN
 
     Body:
 
@@ -495,7 +495,7 @@ Adds a comment to a post.
       "content": "댓글 내용입니다."
     }
 
-    Success Response (201):
+    성공 응답 (201):
 
     {
       "msg": "Comment created successfully",
