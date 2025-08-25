@@ -43,7 +43,7 @@ exports.getFoodDataFromProductID = async (nutrientData) => {
                 const food_weight = row['식품중량'];
                 console.log("DB에서 가져온 row: ", row);
 
-                return resolve({
+                resolve({
                     ...nutrientData,
                     food_name: row['식품명'] ?? nutrientData.food_name,
                     calories: recalculate_value(row['에너지_kcal'], food_weight) ?? nutrientData.calories,
