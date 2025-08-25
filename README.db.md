@@ -83,3 +83,31 @@ create table comment(
     created_at datetime,
     foreign key (post_id) references board(post_id)
 );
+
+## user_inquiry
+
+create table user_inquiry(	
+    id int auto_increment primary key,
+    user_id varchar(50) not null,
+    inquiry_type enum('서비스','기술','일반','회원정보','시스템', '기타') not null,
+    title varchar(100),
+    content text,
+    created_at datetime,
+    is_answered tinyint(1) default 0,
+    foreign key(user_id) references user(user_id)
+);	
+
+## inquiry_answer
+
+create table user_inquiry(	
+    id int auto_increment primary key,
+    user_id varchar(50) not null,
+    inquiry_type enum('서비스','기술','일반','회원정보','시스템', '기타') not null,
+    title varchar(100),
+    content text,
+    created_at datetime,
+    is_answered tinyint(1) default 0,
+    foreign key(user_id) references user(user_id)
+);	
+
+

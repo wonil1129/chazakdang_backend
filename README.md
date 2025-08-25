@@ -483,77 +483,82 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
 
     ```
 
-6\. 게시판 (`/api/posts`)
+6\. 문의 (`/api/inquiry`)
 ----------------------
 
-커뮤니티 게시판의 게시글과 댓글을 관리합니다.
+1대1 문의 기능
 
-### 게시글 목록 조회
+### 사용자 문의 목록 조회
 
-페이지별로 게시글 목록을 조회합니다.
+사용자의 문의 목록을 조회합니다.
 
 -   **메서드:**  `GET`
 
--   **엔드포인트:**  `/api/posts?page=1`
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
+
+-   **엔드포인트:**  `/api/inquiry/List
 
 -   **성공 응답 (200):**
 
     ```
     [
       {
-        "post_id": 1,
+        "id": 1,
         "title": "첫 번째 게시글",
-        "created_at": "2025-08-23T09:00:00.000Z",
-        "masked_name": "강*성"
+        "inquiry_type": "서비스",
+        "is_answered": "1",
+        "created_at": "2025-08-23T09:00:00.000Z"
       }
     ]
 
     ```
 
-### 게시글 상세 조회
+### 문의 상세 조회
 
-단일 게시글과 해당 글의 댓글들을 조회합니다.
+단일 문의와 해당 문의의 답변을 조회합니다.
 
 -   **메서드:**  `GET`
 
--   **엔드포인트:**  `/api/posts/:id`
+-   **엔드포인트:**  `/api/inquiry/:id`
+
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
 -   **성공 응답 (200):**
 
     ```
-    {
-      "post": {
-        "title": "첫 번째 게시글",
-        "content": "내용입니다.",
-        "user_name": "강재성"
-      },
-      "comments": [
-        {
-          "content": "좋은 글이네요!",
-          "user_name": "UserB"
-        }
-      ]
-    }
+    
+  {
+    "id": 3,
+    "user_id": "user11",
+    "inquiry_type": "서비스",
+    "title": "dddddd",
+    "content": "ㅇㅇㅇㅇㅇ",
+    "created_at": "2025-08-23T04:13:49.000Z",
+    "is_answered": 0,
+    "answer": null
+  }
+    
 
     ```
 
-### 게시글 작성
+### 문의 작성
 
-새로운 게시글을 작성합니다.
+새로운 문의를 작성합니다.
 
 -   **메서드:**  `POST`
 
--   **엔드포인트:**  `/api/posts`
+-   **엔드포인트:**  `/api/inquiry`
 
 -   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
 -   **Body:**
 
     ```
-    {
-      "title": "새로운 글 제목",
-      "content": "새로운 글 내용입니다."
-    }
+ {
+    "inquiry_type": "문의 종류",
+    "title": "새로운 문의 제목",
+    "content": "새로운 문의 내용"
+  }
 
     ```
 
@@ -561,18 +566,18 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
 
     ```
     {
-      "msg": "게시글이 등록되었습니다."
+      "msg": "문의가 성공적으로 생성되었습니다."
     }
 
     ```
 
-### 게시글 수정
+### 문의 수정
 
-기존 게시글을 수정합니다.
+기존 문의를 수정합니다.
 
--   **메서드:**  `PUT`
+-   **메서드:**  `PATCH`
 
--   **엔드포인트:**  `/api/posts/:id`
+-   **엔드포인트:**  `/api/inquiry/:id`
 
 -   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
@@ -580,8 +585,9 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
 
     ```
     {
-      "title": "수정된 글 제목",
-      "content": "수정된 글 내용입니다."
+      "inquiry_type": "수정 문의 유형"
+      "title": "수정할 글 제목",
+      "content": "수정할 글 내용입니다."
     }
 
     ```
@@ -590,7 +596,7 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
 
     ```
     {
-      "msg": "게시글이 수정되었습니다."
+      "msg": "문의가 성공적으로 수정되었습니다."
     }
 
     ```
@@ -601,7 +607,7 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
 
 -   **메서드:**  `DELETE`
 
--   **엔드포인트:**  `/api/posts/:id`
+-   **엔드포인트:**  `/api/inquiry/:id`
 
 -   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
@@ -609,36 +615,7 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
 
     ```
     {
-      "msg": "게시글이 삭제되었습니다."
-    }
-
-    ```
-
-### 댓글 작성
-
-게시글에 댓글을 추가합니다.
-
--   **메서드:**  `POST`
-
--   **엔드포인트:**  `/api/posts/:id/comments`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **Body:**
-
-    ```
-    {
-      "content": "댓글 내용입니다."
-    }
-
-    ```
-
--   **성공 응답 (201):**
-
-    ```
-    {
-      "msg": "Comment created successfully",
-      "commentId": 123
+      "msg": "문의가 성공적으로 삭제되었습니다."
     }
 
     ```

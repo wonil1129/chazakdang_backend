@@ -61,7 +61,6 @@ exports.updateInquiry = async (req, res) => {
 
 exports.getInquiriesList = async (req, res) => {
     const userId = req.user.id;
-    console.log(userId);
 
     try {
         const inquiries = await inquiryService.getInquiriesList(userId);
