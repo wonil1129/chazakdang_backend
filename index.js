@@ -10,7 +10,7 @@ const userRoutes = require('./src/routes/userRoutes');
 const eatingHistoryRoutes = require('./src/routes/eatingHistoryRoutes');
 const calendarRoutes = require('./src/routes/calendarRoutes');
 const rankingRoutes = require('./src/routes/rankingRoutes');
-// const postsRoutes = require('./src/routes/boardRoutes');
+const inquiryRoutes = require('./src/routes/inquiryRoutes');
 
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
@@ -20,8 +20,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/eating-history', eatingHistoryRoutes);
 app.use('/api/calendar', calendarRoutes);
 app.use('/api/rankings', rankingRoutes);
-// app.use('/api/posts', postsRoutes);
-
+app.use('/api/inquiry', inquiryRoutes);
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Internal Server Error' });
