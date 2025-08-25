@@ -61,7 +61,7 @@ exports.updateInquiry = (inquiryId, userId, updateFields) => {
             resolve(result);
         });
     });
-};  
+};
 
 // 문의 목록 조회
 exports.getInquiriesList = (user_id, page, limit) => {
@@ -77,7 +77,7 @@ exports.getInquiriesList = (user_id, page, limit) => {
             if (err) {
                 return reject(err);
             }
-            resolve(results);      
+            resolve(results);
         });
     });
 };
