@@ -219,17 +219,16 @@ exports.getDetailedProfile = async (req, res) => {
 // Get eating history for a specific date
 exports.getEatingHistoryByDate = async (req, res) => {
   const userId = req.user.id;
-  const { date } = req.body; // CHANGED: Data is now from the request body for POST requests
+  const { date } = req.body;
 
   if (!date) return res.status(400).json({ msg: 'Date is required' });
 
   try {
     const eatingHistory = await userService.getEatingHistoryByIdAndDate(userId, date);
     if (!eatingHistory || eatingHistory.length === 0) {
-      // Return an empty array instead of an error for dates with no records
       return res.json([]);
     }
-    res.json(eatingHistory); // CHANGED: Return only the array of records as per API doc
+    res.json(eatingHistory);
   } catch (error) {
     console.error('Error fetching eating history:', error);
     return res.status(500).json({ msg: 'Error fetching eating history' });
