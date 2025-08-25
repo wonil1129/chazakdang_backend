@@ -49,6 +49,7 @@ CREATE TABLE eating_history (
     nutrient_list TEXT,
     rating TINYINT UNSIGNED,
     review_text TEXT,
+	eating_percent FLOAT NOT NULL DEFAULT 1.0,
     FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
 
