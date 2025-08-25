@@ -119,3 +119,4 @@ exports.inquiryUpdateSchema = Joi.object({
     title: Joi.string(),
     content: Joi.string()
 }).min(1); // 최소 1개 필드는 있어야 함
+
