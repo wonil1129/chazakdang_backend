@@ -64,13 +64,16 @@ exports.updateInquiry = (inquiryId, userId, updateFields) => {
 };  
 
 // 문의 목록 조회
-exports.getInquiriesList = (user_id) => {
+exports.getInquiriesList = (user_id, page, limit) => {
     return new Promise((resolve, reject) => {
+        const offset = (page - 1) * limit;
         const sql = `select id, title, inquiry_type, is_answered, created_at
                     from user_inquiry
                     where user_id = ?
+                    ORDER BY created_at DESC
+                    LIMIT ? OFFSET ?
                     `;
-        db.query(sql, [user_id], (err, results) => {
+        db.query(sql, [user_id, parseInt(limit), parseInt(offset)], (err, results) => {
             if (err) {
                 return reject(err);
             }
