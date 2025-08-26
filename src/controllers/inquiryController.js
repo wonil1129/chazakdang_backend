@@ -62,9 +62,10 @@ exports.getInquiriesList = async (req, res) => {
     const userId = req.user.id;
     const page = parseInt(req.query.page) || 1; // 기본값 1
     const limit = parseInt(req.query.limit) || 8; // 기본값 10
+    const inquiry_type = req.query.inquiry_type || null;
 
     try {
-        const inquiries = await inquiryService.getInquiriesList(userId, page, limit);
+        const inquiries = await inquiryService.getInquiriesList(userId, page, limit, inquiry_type);
         res.status(200).json(inquiries);
     } catch (err) {
         console.error(err);
