@@ -100,7 +100,7 @@ create table user_inquiry(
 
 ## inquiry_answer
 
-create table user_inquiry(	
+create table inquiry_answer(	
     id int auto_increment primary key,
     user_id varchar(50) not null,
     inquiry_type enum('서비스','기술','일반','회원정보','시스템', '기타') not null,
