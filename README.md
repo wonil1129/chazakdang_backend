@@ -239,7 +239,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
       "avg_health_score": 75,
       "totals": {
         "sugar_g": 25,
-        "calories_kcal": 1800
+        "calories_kcal": 1800,
+        "carbohydrate": 123,
+        "protein": 123,
+        "fat": 123
       }
     }
 
