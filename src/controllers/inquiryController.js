@@ -2,7 +2,6 @@ const express = require('express');
 const inquiryService = require('../services/inquiryService');
 const path = require('path');
 const auth = require('../middleware/auth');
-const { Console } = require('console');
 
 exports.createInquiry = async (req, res) => {
     const userId = req.user.id; // 인증 미들웨어에서 설정한 사용자 정보
@@ -16,7 +15,7 @@ exports.createInquiry = async (req, res) => {
 
     try {
         const result = await inquiryService.createInquiry(inquiry_type, title, content, userId);
-        res.status(201).json({ message: '문의가 성공적으로 생성되었습니다.', inquiryId: result.insertId });
+        res.status(201).json({ message: '문의가 성공적으로 생성되었습니다.' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: '서버 오류로 인해 문의 생성에 실패했습니다.' });
