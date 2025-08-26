@@ -105,7 +105,10 @@ exports.getTodaySummary = (user_id) => {
       SELECT
         ROUND(COALESCE(AVG(health_score), 0), 0)  AS avg_health_score,
         ROUND(COALESCE(SUM(sugar), 0), 1)         AS sugar_g,
-        ROUND(COALESCE(SUM(calories), 0), 0)      AS calories_kcal
+        ROUND(COALESCE(SUM(calories), 0), 0)      AS calories_kcal,
+        SUM(carbohydrate)                         AS carbohydrate,
+        SUM(protein)                              AS protein,
+        SUM(fat)                                  AS fat
       FROM eating_history
       WHERE user_id = ? AND DATE(eating_time) = CURDATE()
     `;

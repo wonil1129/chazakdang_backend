@@ -40,8 +40,8 @@ exports.getFoodDataFromProductID = async (nutrientData) => {
                 }
 
                 const row = results[0];
-                const food_weight = row['식품중량'];
-                console.log("DB에서 가져온 row: ", row);
+                const food_weight = parseFloat(row['식품중량'].replace(/[^\d.]/g, ''));
+                console.log("food_weight: ", food_weight);
 
                 resolve({
                     ...nutrientData,
