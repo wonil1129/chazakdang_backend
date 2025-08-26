@@ -131,6 +131,7 @@ exports.uploadProfileImage = async (req, res) => {
 exports.uploadNutrientsImage = async (req, res) => {
   const user_id = req.user.id;
   const nutrient_image = `uploads/nutrients_images/${req.file.filename}`;
+  const eating_percent = req.body.eating_percent;
   let prediction = { predicted_value: 'NaN' };
 
   try {
@@ -172,7 +173,8 @@ exports.uploadNutrientsImage = async (req, res) => {
       ...nutrientData,
       product_image,
       nutrient_image,
-      health_score: prediction.predicted_value || -1,
+      health_score: prediction.predicted_value ?? -1,
+      eating_percent: eating_percent ?? 1.0
     });
 
     try {

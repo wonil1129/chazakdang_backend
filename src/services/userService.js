@@ -272,8 +272,8 @@ exports.insertEatingHistory = (user_id, data) => {
       user_id, health_score, eating_time, food_name, calories, protein, fat,
       carbohydrate, sugar, sodium, cholesterol, saturated_fat,
       trans_fat, food_weight, product_image, nutrient_image,
-      nutrient_list, rating, review_text
-    ) VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      nutrient_list, rating, review_text, eating_percent
+    ) VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
     const values = [
       user_id,
@@ -294,6 +294,7 @@ exports.insertEatingHistory = (user_id, data) => {
       data.nutrient_list,
       data.rating,
       data.review_text,
+      data.eating_percent
     ];
     return new Promise((resolve, reject) => {
         db.query(sql, values, (err, result) => {
