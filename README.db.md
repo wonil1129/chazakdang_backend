@@ -100,7 +100,7 @@ create table user_inquiry(
 
 ## inquiry_answer
 
-create table user_inquiry(	
+create table inquiry_answer(	
     id int auto_increment primary key,
     user_id varchar(50) not null,
     inquiry_type enum('회원가입/탈퇴','앱기능','건강분석','회원정보','기타') not null,

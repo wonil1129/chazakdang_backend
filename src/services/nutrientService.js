@@ -1,4 +1,5 @@
 const gemini = require('../utils/gemini');
+const gemini2 = require('../utils/gemini2');
 
 async function analyzeNutrients(imagePath, userInfo) {
     let result = await gemini.analyzeNutrients(imagePath, userInfo);
@@ -30,4 +31,8 @@ async function analyzeNutrients(imagePath, userInfo) {
   };
 }
 
-module.exports = { analyzeNutrients };
+async function analyzeNutrients2(nutrientData, userInfo) {
+    return await gemini2.analyzeNutrients2(nutrientData, userInfo);
+}
+
+module.exports = { analyzeNutrients, analyzeNutrients2 };

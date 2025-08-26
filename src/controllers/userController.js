@@ -108,6 +108,9 @@ exports.getTodaySummary = async (req, res) => {
       totals: {
         sugar_g: summary.sugar_g,
         calories_kcal: summary.calories_kcal,
+        carbohydrate: summary.carbohydrate,
+        protein: summary.protein,
+        fat: summary.fat,
       },
     });
   } catch (error) {
@@ -150,6 +153,11 @@ exports.uploadNutrientsImage = async (req, res) => {
     }
     try {
       nutrientData = sweetener_cleaner.clean_and_standardize_nutrients(nutrientData);
+    } catch (error) {
+      console.error(error);
+    }
+    try {
+      nutrientData = await nutrientService.analyzeNutrients2(nutrientData, userInfo);
     } catch (error) {
       console.error(error);
     }

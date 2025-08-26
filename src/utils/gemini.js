@@ -19,7 +19,7 @@ const nutrientSchema = {
     trans_fat: { type: Type.NUMBER, description: "트랜스지방, g 단위" },
     food_weight: { type: Type.NUMBER, description: "표기된 총 중량 (g 또는 ml 단위의 숫자 값)" },
     ingredients: { type: Type.STRING, description: "원재료 목록에서 찾은 대체당, 인공 감미료. 쉼표로 구분된 문자열. 예: '아스파탐, 수크랄로스'. 없으면 ''." },
-    rating: { type: Type.INTEGER, description: "건강에 대한 평점, 1에서 5까지의 정수" },
+    rating: { type: Type.INTEGER, description: "건강에 대한 평점, 1에서 5까지의 정수, 기본값 1" },
     review_sweetener: { type: "string", description: "대체당 및 인공 감미료에 대한 분석" },
     review_nutrition: { type: "string", description: "주요 영양성분에 대한 분석" },
     review_health: { type: "string", description: "사용자의 개인 건강 정보(질병, 임신 여부 등)에 맞춘 맞춤 분석" },
