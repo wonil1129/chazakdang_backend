@@ -152,11 +152,7 @@ exports.editEatingHistory = (userId, foodId, data) => {
             'protein', 'fat', 'carbohydrate', 'sugar', 'sodium',
             'cholesterol', 'saturated_fat', 'trans_fat', 'food_weight',
             'product_image', 'nutrient_image', 'nutrient_list',
-<<<<<<< HEAD
             'rating', 'review_text', 'eating_percent', 'is_percent'
-=======
-            'rating', 'review_text', 'eating_percent'
->>>>>>> 30571ab (WIP: grams input + is_percent update)
         ];
 
         const setClauses = [];
