@@ -299,6 +299,27 @@ exports.editEatingHistory = async (req, res) => { // CHANGED: Renamed function t
   }
 }
 
+// Delete a specific eating history record
+exports.deleteEatingHistory = async (req, res) => {
+  const userId = req.user.id;
+  const foodId = req.params.id;
+
+  try {
+    const results = await userService.deleteEatingHistory(userId, foodId);
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ msg: "Record not found or user not authorized to delete"});
+    }
+    return res.json({ msg: "Successfully deleted eating history"});
+  } catch (error) {
+    console.error("Error deleting eating history:", error);
+    return res.status(500).json({ msg: "An error occurred on the server." });
+  }
+}
+
+
+
+
+
 // Get which days in a month have records
 exports.getDaysWithRecords = async (req, res) => {
   const userId = req.user.id;

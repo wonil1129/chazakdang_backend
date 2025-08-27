@@ -379,6 +379,24 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
 
     ```
 
+### 기록 삭제
+
+특정 식단 기록을 삭제합니다.
+
+-   **메서드:**  `DELETE`
+
+-   **엔드포인트:**  `/api/eating-history/:id`
+
+-   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
+
+-   **성공 응답 (200):**
+
+    ```
+    {
+      "msg": "Successfully deleted eating history"
+    }
+
+    ```
 ### 제품 이미지 분석 요청
 
 분석할 제품의 영양성분표 이미지를 업로드합니다.

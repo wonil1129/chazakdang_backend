@@ -152,7 +152,11 @@ exports.editEatingHistory = (userId, foodId, data) => {
             'protein', 'fat', 'carbohydrate', 'sugar', 'sodium',
             'cholesterol', 'saturated_fat', 'trans_fat', 'food_weight',
             'product_image', 'nutrient_image', 'nutrient_list',
+<<<<<<< HEAD
             'rating', 'review_text', 'eating_percent', 'is_percent'
+=======
+            'rating', 'review_text', 'eating_percent'
+>>>>>>> 30571ab (WIP: grams input + is_percent update)
         ];
 
         const setClauses = [];
@@ -184,6 +188,16 @@ exports.editEatingHistory = (userId, foodId, data) => {
                 return reject(error);
             }
             resolve(results);
+        });
+    });
+};
+
+exports.deleteEatingHistory = (userId, foodId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM eating_history WHERE id = ? AND user_id = ?';
+        db.query(sql, [foodId, userId], (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
         });
     });
 };
@@ -306,3 +320,13 @@ exports.insertEatingHistory = (user_id, data) => {
         })
     })
 };
+
+exports.updateEatingPercent = (user_id, id, eating_percent) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'UPDATE eating_history SET eating_percent = ? WHERE user_id = ? AND id = ?';
+        db.query(sql, [eating_percent, user_id, id], (err, result) => {
+            if (err) return reject(err);
+            resolve(result.affectedRows > 0);
+        });
+    });
+}
