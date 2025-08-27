@@ -91,7 +91,7 @@ create table comment(
 create table user_inquiry(	
     id int auto_increment primary key,
     user_id varchar(50) not null,
-    inquiry_type enum('서비스','기술','일반','회원정보','시스템', '기타') not null,
+    inquiry_type enum('서비스','앱기능','건강분석','기타') not null,
     title varchar(100),
     content text,
     created_at datetime,
