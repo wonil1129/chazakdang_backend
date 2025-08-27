@@ -65,27 +65,6 @@ CREATE TABLE ranking_log (
     FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
 
-## board
-
-CREATE TABLE  board(
-    post_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id VARCHAR(50) NOT NULL,
-    title VARCHAR(100) NOT NULL,
-    content TEXT NOT NULL,
-    created_at DATETIME
-);
-
-## comment
-
-create table comment(
-	comment_id int auto_increment primary key,
-    post_id int,
-    user_id varchar(50),
-    content text not null,
-    created_at datetime,
-    foreign key (post_id) references board(post_id)
-);
-
 ## user_inquiry
 
 create table user_inquiry(	
@@ -96,20 +75,7 @@ create table user_inquiry(
     content text,
     created_at datetime,
     is_answered tinyint(1) default 0,
+    answer text,
     foreign key(user_id) references user(user_id)
 );	
-
-## inquiry_answer
-
-create table inquiry_answer(	
-    id int auto_increment primary key,
-    user_id varchar(50) not null,
-    inquiry_type enum('회원가입/탈퇴','앱기능','건강분석','회원정보','기타') not null,
-    title varchar(100),
-    content text,
-    created_at datetime,
-    is_answered tinyint(1) default 0,
-    foreign key(user_id) references user(user_id)
-);	
-
 
