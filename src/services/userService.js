@@ -76,7 +76,7 @@ exports.getEatingHistoryByIdAndDate = (user_id, date) => {
           SELECT id, eating_time, food_name, product_image, rating, nutrient_image, health_score, nutrient_list, review_text, calories, protein, fat, carbohydrate, sugar, sodium
           FROM eating_history
           WHERE user_id = ? AND DATE(eating_time) = ?
-          ORDER BY eating_time ASC
+          ORDER BY eating_time DESC
         `;
         db.query(sql, [user_id, date], (err, results) => {
             if (err) return reject(err);
@@ -275,8 +275,8 @@ exports.insertEatingHistory = (user_id, data) => {
       user_id, health_score, eating_time, food_name, calories, protein, fat,
       carbohydrate, sugar, sodium, cholesterol, saturated_fat,
       trans_fat, food_weight, product_image, nutrient_image,
-      nutrient_list, rating, review_text, eating_percent
-    ) VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      nutrient_list, rating, review_text, eating_percent, is_percent
+    ) VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
     const values = [
       user_id,
@@ -297,7 +297,8 @@ exports.insertEatingHistory = (user_id, data) => {
       data.nutrient_list,
       data.rating,
       data.review_text,
-      data.eating_percent
+      data?.eating_percent ?? 1.0,
+      data?.is_percent ?? true
     ];
     return new Promise((resolve, reject) => {
         db.query(sql, values, (err, result) => {
