@@ -301,7 +301,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
           "fat": 8,
           "carbohydrate": 22,
           "sugar": 5,
-          "sodium": 150
+          "sodium": 150,
+          "cholesterol": 75.6,
+          "saturated_fat": 23.52,
+          "trans_fat": 0.588,
+          "food_weight": "168g",
+          "product_image": "uploads/product_images/placeholder.jpg",
+          "nutrient_image": "uploads/nutrients_images/image-1756254574428-990832697.jpg",
+          "nutrient_list": "D-말티톨, 소비톨, 에리스리톨, 수크랄로스, 아세설팜칼륨, 폴리글리시톨",
+          "rating": 4,
+          "review_text": "이 제품은...",
+          "eating_percent": 55,
+          "is_percent": 0
         }
       ]
     }
