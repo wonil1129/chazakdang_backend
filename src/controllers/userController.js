@@ -53,7 +53,7 @@ exports.register = async (req, res) => {
         });
     } catch (err) {
       console.error('Register error:', err);
-      return res.status(500).json({ msg: 'Register failed', error: err.message || err });
+      return res.status(500).json({ msg: 'Register failed', error: err.message ?? err });
     }
 };
 
@@ -103,7 +103,7 @@ exports.getTodaySummary = async (req, res) => {
     const summary = await userService.getTodaySummary(userId);
 
     return res.json({
-      name: user?.user_name || '',
+      name: user?.user_name ?? '',
       avg_health_score: summary.avg_health_score,
       totals: {
         sugar_g: summary.sugar_g,
@@ -163,19 +163,24 @@ exports.uploadNutrientsImage = async (req, res) => {
       console.error(error);
     }
 
-    try {
-      console.log('Sending data to Python script for prediction:', nutrientData);
-      prediction = await predictionService.runPrediction(nutrientData);
-      console.log("prediction: ", prediction);
-    } catch (error) {
-      console.error('Error running prediction:', error);
-      prediction = { predicted_value: 'NaN' };
+    if(nutrientData.analyzable) {
+      try {
+        console.log('Sending data to Python script for prediction:', nutrientData);
+        prediction = await predictionService.runPrediction(nutrientData);
+        console.log("prediction: ", prediction);
+      } catch (error) {
+        console.error('Error running prediction:', error);
+        prediction = { predicted_value: -1 };
+      }
+    } else {
+      prediction = { predicted_value: -1 };
     }
+
     res.json({
       msg: 'Nutrients image uploaded successfully',
       analyzeResult: nutrientData,
       coupang: nutrient_image.includes('placeholder') ? { msg: 'No product image found' } : nutrient_image,
-      health_score: prediction.predicted_value || 'NaN',
+      health_score: prediction.predicted_value ?? -1,
     });
 
     await userService.insertEatingHistory(user_id, {
@@ -251,7 +256,7 @@ exports.getEatingHistoryByDate = async (req, res) => {
 // Get recent eating history
 exports.getRecentEatingHistory = async (req, res) => {
   const userId = req.user.id;
-  const limit = req.query.limit || 3;
+  const limit = req.query.limit ?? 3;
 
   try {
     const recentEatingHistory = await userService.getRecentEatingHistory(userId, limit);

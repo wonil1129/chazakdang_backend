@@ -45,9 +45,9 @@ exports.analyzeNutrients2 = async (nutrientData, userInfo) => {
 - 임신 여부: ${userInfo.preg === 1 ? '임신 중' : '임신 아님'}
 - 질병 정보: ${userInfo.dis ?? "질병 없음"}
 
-review_sweetener: 대체당 분석
-review_nutrition: 영양성분 분석
-review_health: 사용자의 건강 정보에 맞춘 분석
+review_sweetener: 대체당 분석. 최대 3줄까지만
+review_nutrition: 영양성분 분석. 최대 3줄까지만
+review_health: 사용자의 건강 정보에 맞춘 분석. 최대 3줄까지만
 `;
 
   const response = await ai.models.generateContent({

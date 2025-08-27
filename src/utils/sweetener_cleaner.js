@@ -43,8 +43,20 @@ exports.clean_and_standardize_nutrients = (nutrientData) => {
     const finalUniqueList = [...new Set(cleanedListAsArray)];
     const cleanedListAsString = finalUniqueList.join(', ');
 
+    const keys = ["calories", "protein", "fat", "carbohydrate", "sugar", "sodium", "cholesterol", "saturated_fat", "trans_fat"];
+
+    let analyzable = true;
+
+    keys.forEach(key => {
+        if (nutrientData[key] == -1) {
+            nutrientData[key] = 0;
+            analyzable = false;
+        }
+    });
+
     return {
         ...nutrientData,
-        nutrient_list: cleanedListAsString
+        nutrient_list: cleanedListAsString,
+        analyzable: analyzable
     };
 };

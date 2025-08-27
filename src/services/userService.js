@@ -103,7 +103,7 @@ exports.getTodaySummary = (user_id) => {
   return new Promise((resolve, reject) => {
     const sql = `
       SELECT
-        ROUND(COALESCE(AVG(health_score), 0), 0)  AS avg_health_score,
+        ROUND(COALESCE(AVG(CASE WHEN health_score <> -1 THEN health_score END), 0), 0) AS avg_health_score,
         ROUND(COALESCE(SUM(sugar), 0), 1)         AS sugar_g,
         ROUND(COALESCE(SUM(calories), 0), 0)      AS calories_kcal,
         SUM(carbohydrate)                         AS carbohydrate,
