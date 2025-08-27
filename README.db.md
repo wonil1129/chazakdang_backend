@@ -50,6 +50,7 @@ CREATE TABLE eating_history (
     rating TINYINT UNSIGNED,
     review_text TEXT,
 	eating_percent FLOAT NOT NULL DEFAULT 1.0,
+ 	is_percent BOOL DEFAULT 1,
     FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
 
