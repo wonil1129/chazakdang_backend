@@ -1,85 +1,85 @@
 const pool = require('../../config/db');
 const { updateDailyRanking, updateWeeklyRanking, updateMonthlyRanking } = require('../services/rankingUpdater');
 
-// Query helper using pool
 const query = (sql, params) => pool.promise().query(sql, params);
-
-/**
- * Fetches rankings based on a specified period (daily, weekly, monthly).
- * It returns the top 10 users and the current user's rank.
- */
 exports.getRankingByPeriod = async (req, res) => {
-    const { period } = req.query;
+    // 1. Destructure 'period' and 'date' from the query parameters.
+    const { period, date } = req.query;
     const userId = req.user.id;
 
-    let sql;
+    // 2. Determine the target date. Default to today if no date is provided.
+    //    The 'isHistoricalQuery' flag helps decide whether to trigger an update later.
+    const targetDate = date ? date : new Date().toISOString().slice(0, 10);
+    const isHistoricalQuery = !!date;
+
     let updateFunction;
-    let scoreColumn;
+    let rankDateCondition;
+    let sqlParams;
     let noDataMessage;
 
-    // Determine the correct SQL query and settings based on the period
+    // 3. Define a reusable SQL template using a Common Table Expression (CTE).
+    //    This avoids repeating the large query block for each case.
+    const sqlTemplate = (dateCondition) => `
+        WITH ranked AS (
+            SELECT 
+                a.user_id, 
+                a.user_name, 
+                a.profile_image, 
+                b.score,
+                RANK() OVER (ORDER BY b.score DESC, b.user_id ASC) AS user_rank
+            FROM user a 
+            JOIN ranking_log b ON a.user_id = b.user_id
+            WHERE b.ranking_type = ? AND ${dateCondition}
+        )
+        SELECT * FROM ranked WHERE user_rank <= 10 OR user_id = ? ORDER BY user_rank;
+    `;
+
+    // 4. Configure query settings based on the requested 'period'.
     switch (period) {
         case 'daily':
-            scoreColumn = 'daily_score';
-            noDataMessage = '오늘의 랭킹 데이터가 아직 없습니다.';
+            noDataMessage = '해당 날짜의 랭킹 데이터가 없습니다.';
             updateFunction = updateDailyRanking;
-            sql = `
-                WITH ranked AS (
-                    SELECT a.user_id, a.user_name, a.profile_image, b.score AS ${scoreColumn},
-                           RANK() OVER (ORDER BY b.score DESC, b.user_id ASC) AS user_rank
-                    FROM user a JOIN ranking_log b ON a.user_id = b.user_id
-                    WHERE b.ranking_type = 'daily' AND b.rank_date = CURDATE()
-                )
-                SELECT * FROM ranked WHERE user_rank <= 10 OR user_id = ? ORDER BY user_rank;
-            `;
+            // For daily, the rank_date is an exact match.
+            rankDateCondition = `b.rank_date = ?`;
+            sqlParams = [period, targetDate, userId];
             break;
 
         case 'weekly':
-            scoreColumn = 'weekly_score';
-            noDataMessage = '이번 주의 랭킹 데이터가 아직 없습니다.';
+            noDataMessage = '해당 주의 랭킹 데이터가 없습니다.';
             updateFunction = updateWeeklyRanking;
-            sql = `
-                WITH ranked AS (
-                    SELECT a.user_id, a.user_name, a.profile_image, b.score AS ${scoreColumn},
-                           RANK() OVER (ORDER BY b.score DESC, b.user_id ASC) AS user_rank
-                    FROM user a JOIN ranking_log b ON a.user_id = b.user_id
-                    WHERE b.ranking_type = 'weekly' AND b.rank_date = DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)
-                )
-                SELECT * FROM ranked WHERE user_rank <= 10 OR user_id = ? ORDER BY user_rank;
-            `;
+            // For weekly, find the first day of the week (Monday) for the targetDate.
+            rankDateCondition = `b.rank_date = DATE_SUB(?, INTERVAL WEEKDAY(?) DAY)`;
+            sqlParams = [period, targetDate, targetDate, userId];
             break;
 
         case 'monthly':
-            scoreColumn = 'monthly_score';
-            noDataMessage = '이번 달 랭킹 데이터가 아직 없습니다.';
+            noDataMessage = '해당 월의 랭킹 데이터가 없습니다.';
             updateFunction = updateMonthlyRanking;
-            sql = `
-                WITH ranked AS (
-                    SELECT a.user_id, a.user_name, a.profile_image, b.score AS ${scoreColumn},
-                           RANK() OVER (ORDER BY b.score DESC, b.user_id ASC) AS user_rank
-                    FROM user a JOIN ranking_log b ON a.user_id = b.user_id
-                    WHERE b.ranking_type = 'monthly' AND b.rank_date = DATE_FORMAT(CURDATE(), '%Y-%m-01')
-                )
-                SELECT * FROM ranked WHERE user_rank <= 10 OR user_id = ? ORDER BY user_rank;
-            `;
+            // For monthly, find the first day of the month for the targetDate.
+            rankDateCondition = `b.rank_date = DATE_FORMAT(?, '%Y-%m-01')`;
+            sqlParams = [period, targetDate, userId];
             break;
 
         default:
             return res.status(400).json({ msg: 'Invalid period specified. Use "daily", "weekly", or "monthly".' });
     }
 
-    try {
-        // First attempt to fetch rankings
-        let [results] = await query(sql, [userId]);
+    // Construct the final SQL query from the template and conditions.
+    const sql = sqlTemplate(rankDateCondition);
 
-        // If no rankings exist, try to generate them and fetch again
-        if (results.length === 0) {
-            console.log(`${period} 랭킹 정보가 없습니다. 랭킹 업데이트를 시도합니다.`);
+    try {
+        // 5. Attempt to fetch the ranking data from the database.
+        let [results] = await query(sql, sqlParams);
+
+        // 6. If no data is found AND the request is for the current period (not historical),
+        //    try to generate the rankings and fetch the data again.
+        if (results.length === 0 && !isHistoricalQuery) {
+            console.log(`Current ${period} ranking data is missing. Attempting to update.`);
             await updateFunction();
-            [results] = await query(sql, [userId]);
+            [results] = await query(sql, sqlParams); // Re-fetch
         }
 
-        // If there's still no data, return an empty response
+        // 7. If there's still no data, return a clean empty response.
         if (results.length === 0) {
             return res.json({
                 msg: noDataMessage,
@@ -88,214 +88,35 @@ exports.getRankingByPeriod = async (req, res) => {
             });
         }
 
-        // Format the top 10 list
+        // 8. Format the results for the API response.
+        //    - Create the top_10 list.
         const top_10 = results
             .filter(r => r.user_rank <= 10)
             .map(r => ({
                 rank: r.user_rank,
                 user_name: r.user_name,
                 profile_image: r.profile_image,
-                score: r[scoreColumn] // Use the dynamic score column name
+                score: r.score
             }));
 
-        // Find the current user's rank information
+        //    - Find the requesting user's rank data.
         const myRankData = results.find(r => r.user_id === userId);
         const my_rank = myRankData ? {
             rank: myRankData.user_rank,
             user_name: myRankData.user_name,
             profile_image: myRankData.profile_image,
-            score: myRankData[scoreColumn]
+            score: myRankData.score
         } : null;
 
-        // Send the final response
+        // 9. Send the final JSON response.
         res.json({ top_10, my_rank });
 
     } catch (err) {
-        console.error(`${period} 랭킹 조회 중 오류 발생:`, err);
-        res.status(500).json({ msg: `${period} 랭킹 조회 중 서버 오류가 발생했습니다.`, err: err.message });
+        console.error(`${period} ranking query error for date ${targetDate}:`, err);
+        // Add specific error handling for invalid date formats from MySQL.
+        if (err.code === 'ER_TRUNCATED_WRONG_VALUE' || err.code === 'ER_INCORRECT_DATE_VALUE') {
+             return res.status(400).json({ msg: 'Invalid date format provided. Please use YYYY-MM-DD.' });
+        }
+        res.status(500).json({ msg: `An error occurred while fetching the ${period} ranking.`, err: err.message });
     }
 };
-
-
-/* old code
-const pool = require('../../config/db');
-const { updateDailyRanking, updateWeeklyRanking, updateMonthlyRanking } = require('../services/rankingUpdater');
-
-// Query helper using pool
-const query = (sql, params) => pool.promise().query(sql, params);
-
-exports.getRankingByPeriod = async (req, res) => {
-    res.json({ msg: "test" });
-};
-
-exports.dailyRanking = async (req, res) => {
-    const user_id = req.user.id;
-
-    const getDailyRankingSql = `
-        WITH ranked AS (
-            SELECT
-                a.user_id,
-                a.user_name,
-                a.profile_image,
-                b.score AS daily_score,
-                RANK() OVER (ORDER BY b.score DESC, b.user_id ASC) AS user_rank
-            FROM user a
-            JOIN ranking_log b ON a.user_id = b.user_id
-            WHERE b.ranking_type = 'daily'
-              AND b.rank_date = CURDATE()
-        )
-        SELECT *
-        FROM ranked
-        WHERE user_rank <= 10 OR user_id = ?
-        ORDER BY user_rank
-    `;
-
-    try {
-        let [results] = await query(getDailyRankingSql, [user_id]);
-
-        if (results.length === 0) {
-            console.log('일간 랭킹 정보가 없습니다. 랭킹 업데이트를 시도합니다.');
-            await updateDailyRanking();
-            [results] = await query(getDailyRankingSql, [user_id]);
-        }
-
-        if (results.length === 0) {
-            return res.json({
-                msg: '오늘의 랭킹 데이터가 아직 없습니다.',
-                dailyRanking: [],
-                userRanking: null
-            });
-        }
-
-        const dailyRanking = results
-            .filter(r => r.user_rank <= 10)
-            .map(r => ({
-                rank: r.user_rank,
-                user_name: r.user_name,
-                profile_image: r.profile_image,
-                daily_score: r.daily_score
-            }));
-
-        const userRanking = results.find(r => r.user_id === user_id) || null;
-
-        res.json({ dailyRanking, userRanking });
-    } catch (err) {
-        console.error('일간 랭킹 조회 중 오류 발생:', err);
-        res.status(500).json({ msg: '일간 랭킹 조회 중 서버 오류가 발생했습니다.', err: err.message });
-    }
-};
-
-exports.weeklyRanking = async (req, res) => {
-    const user_id = req.user.id;
-
-    const getWeeklyRankingSql = `
-        WITH ranked AS (
-            SELECT
-                a.user_id,
-                a.user_name,
-                a.profile_image,
-                b.score AS weekly_score,
-                RANK() OVER (ORDER BY b.score DESC, b.user_id ASC) AS user_rank
-            FROM user a
-            JOIN ranking_log b ON a.user_id = b.user_id
-            WHERE b.ranking_type = 'weekly'
-              AND b.rank_date = DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)
-        )
-        SELECT *
-        FROM ranked
-        WHERE user_rank <= 10 OR user_id = ?
-        ORDER BY user_rank
-    `;
-
-    try {
-        let [results] = await query(getWeeklyRankingSql, [user_id]);
-
-        if (results.length === 0) {
-            console.log('주간 랭킹 정보가 없습니다. 랭킹 업데이트를 시도합니다.');
-            await updateWeeklyRanking();
-            [results] = await query(getWeeklyRankingSql, [user_id]);
-        }
-
-        if (results.length === 0) {
-            return res.json({
-                msg: '이번 주의 랭킹 데이터가 아직 없습니다.',
-                weeklyRanking: [],
-                userRanking: null
-            });
-        }
-
-        const weeklyRanking = results
-            .filter(r => r.user_rank <= 10)
-            .map(r => ({
-                rank: r.user_rank,
-                user_name: r.user_name,
-                profile_image: r.profile_image,
-                weekly_score: r.weekly_score
-            }));
-
-        const userRanking = results.find(r => r.user_id === user_id) || null;
-
-        res.json({ weeklyRanking, userRanking });
-    } catch (err) {
-        console.error('주간 랭킹 조회 중 오류 발생:', err);
-        res.status(500).json({ msg: '주간 랭킹 조회 중 서버 오류가 발생했습니다.', err: err.message });
-    }
-};
-
-exports.monthlyRanking = async (req, res) => {
-    const user_id = req.user.id;
-
-    const getMonthlyRankingSql = `
-        WITH ranked AS (
-            SELECT
-                a.user_id,
-                a.user_name,
-                a.profile_image,
-                b.score AS monthly_score,
-                RANK() OVER (ORDER BY b.score DESC, b.user_id ASC) AS user_rank
-            FROM user a
-            JOIN ranking_log b ON a.user_id = b.user_id
-            WHERE b.ranking_type = 'monthly'
-              AND b.rank_date = DATE_FORMAT(CURDATE(), '%Y-%m-01')
-        )
-        SELECT *
-        FROM ranked
-        WHERE user_rank <= 10 OR user_id = ?
-        ORDER BY user_rank
-    `;
-
-    try {
-        let [results] = await query(getMonthlyRankingSql, [user_id]);
-
-        if (results.length === 0) {
-            console.log('월간 랭킹 정보가 없습니다. 랭킹 업데이트를 시도합니다.');
-            await updateMonthlyRanking();
-            [results] = await query(getMonthlyRankingSql, [user_id]);
-        }
-
-        if (results.length === 0) {
-            return res.json({
-                msg: '이번 달 랭킹 데이터가 아직 없습니다.',
-                monthlyRanking: [],
-                userRanking: null
-            });
-        }
-
-        const monthlyRanking = results
-            .filter(r => r.user_rank <= 10)
-            .map(r => ({
-                rank: r.user_rank,
-                user_name: r.user_name,
-                profile_image: r.profile_image,
-                monthly_score: r.monthly_score
-            }));
-
-        const userRanking = results.find(r => r.user_id === user_id) || null;
-
-        res.json({ monthlyRanking, userRanking });
-    } catch (err) {
-        console.error('월간 랭킹 조회 중 오류 발생:', err);
-        res.status(500).json({ msg: '월간 랭킹 조회 중 서버 오류가 발생했습니다.', err: err.message });
-    }
-};
-*/
