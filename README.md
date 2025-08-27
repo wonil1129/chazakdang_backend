@@ -432,10 +432,28 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
     ```
     [
       {
-        "eating_time": "2025-08-22T12:30:00.000Z",
-        "food_name": "제로 콜라",
-        "calories": 0,
-        "...": "..."
+        "id": 200,
+        "health_score": 17.897,
+        "user_id": "jaesung",
+        "eating_time": "2025-08-27T00:30:04.000Z",
+        "food_name": "제로 초콜릿칩 쿠키",
+        "calories": 789.6,
+        "protein": 15.12,
+        "fat": 43.68,
+        "carbohydrate": 100.8,
+        "sugar": 0,
+        "sodium": 739.2,
+        "cholesterol": 75.6,
+        "saturated_fat": 23.52,
+        "trans_fat": 0.588,
+        "food_weight": "168g",
+        "product_image": "uploads/product_images/placeholder.jpg",
+        "nutrient_image": "uploads/nutrients_images/image-1756254574428-990832697.jpg",
+        "nutrient_list": "D-말티톨, 소비톨, 에리스리톨, 수크랄로스, 아세설팜칼륨, 폴리글리시톨",
+        "rating": 4,
+        "review_text": "test123",
+        "eating_percent": 0.8,
+        "is_percent": 1
       }
     ]
 
