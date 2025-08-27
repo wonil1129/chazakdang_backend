@@ -73,7 +73,7 @@ exports.checkDuplicateId = (user_id) => {
 exports.getEatingHistoryByIdAndDate = (user_id, date) => {
     return new Promise((resolve, reject) => {
         const sql = `
-          SELECT id, eating_time, food_name, product_image, rating, nutrient_image, health_score, nutrient_list, review_text, calories, protein, fat, carbohydrate, sugar, sodium
+          SELECT *
           FROM eating_history
           WHERE user_id = ? AND DATE(eating_time) = ?
           ORDER BY eating_time DESC
