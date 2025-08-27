@@ -251,7 +251,7 @@ exports.getEatingHistoryByDate = async (req, res) => {
 // Get recent eating history
 exports.getRecentEatingHistory = async (req, res) => {
   const userId = req.user.id;
-  const limit = req.query.limit || 3; // CHANGED: Limit is now from query params for GET requests
+  const limit = req.query.limit || 3;
 
   try {
     const recentEatingHistory = await userService.getRecentEatingHistory(userId, limit);

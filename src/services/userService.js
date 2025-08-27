@@ -88,7 +88,7 @@ exports.getEatingHistoryByIdAndDate = (user_id, date) => {
 exports.getEatingHistoryByFoodId = (userId, foodId) => {
     return new Promise((resolve, reject) => {
         const sql = `
-            SELECT id, eating_time, food_name, product_image, health_score, nutrient_list, review_text, calories, protein, fat, carbohydrate, sugar, sodium
+            SELECT *
             FROM eating_history
             WHERE user_id = ? AND id = ?
         `;
@@ -128,8 +128,7 @@ exports.getRecentEatingHistory = (user_id, limit) => {
         }
 
         const sql = `
-          SELECT id, eating_time, rating, food_name, nutrient_image, health_score, nutrient_list,
-                review_text, calories, protein, fat, carbohydrate, sugar, sodium
+          SELECT *
           FROM eating_history
           WHERE user_id = ?
           ORDER BY eating_time DESC
@@ -153,7 +152,7 @@ exports.editEatingHistory = (userId, foodId, data) => {
             'protein', 'fat', 'carbohydrate', 'sugar', 'sodium',
             'cholesterol', 'saturated_fat', 'trans_fat', 'food_weight',
             'product_image', 'nutrient_image', 'nutrient_list',
-            'rating', 'review_text'
+            'rating', 'review_text', 'eating_percent', 'is_percent'
         ];
 
         const setClauses = [];
