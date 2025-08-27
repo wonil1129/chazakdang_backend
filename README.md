@@ -507,7 +507,7 @@ ID로 특정 식단 기록의 모든 정보를 조회합니다.
 
 -   **메서드:**  `GET`
 
--   **엔드포인트:**  `/api/rankings?period=daily` (또는 `weekly`, `monthly`)
+-   **엔드포인트:**  `/api/rankings?period=daily&date=2025-08-26` period: (`daily`, `weekly`, `monthly`) date: (`yyyy-mm-dd`)
 
 -   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
