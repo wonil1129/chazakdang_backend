@@ -8,5 +8,6 @@ router.get('/recent', verifyToken, userController.getRecentEatingHistory);
 router.patch('/:id', verifyToken, userController.editEatingHistory)
 router.post('/product-image', verifyToken, upload.single('image'), userController.uploadNutrientsImage);
 router.get('/:id', verifyToken, userController.getEatingHistoryById);
+router.delete('/:id', verifyToken, userController.deleteEatingHistory);
 
 module.exports = router;
