@@ -209,7 +209,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 -   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
 
--   **Body:**  `multipart/form-data` 형식, 필드 이름 `image`.
+-   **Body:**  `multipart/form-data` 형식, 필드 이름 `image`: 식품 이미지, `eating_percent`: 먹은 양(% 또는 gram), `is_percent`: %로 입력시 1, gram으로 입력시 0
 
 -   **성공 응답 (200):**
 
