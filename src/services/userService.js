@@ -103,43 +103,47 @@ exports.getTodaySummary = (user_id) => {
   return new Promise((resolve, reject) => {
     const sql = `
       SELECT
-        -- Health score is an average of the food type, not affected by quantity eaten.
         ROUND(COALESCE(AVG(CASE WHEN health_score <> -1 THEN health_score END), 0), 0) AS avg_health_score,
 
-        -- For each nutrient, calculate the actual amount eaten before summing.
-        -- We use a CASE statement to handle the two different ways of recording portions.
         ROUND(COALESCE(SUM(
           CASE
-            WHEN is_percent = 1 THEN sugar * eating_percent -- is_percent is TRUE: eating_percent is a multiplier (e.g., 0.5 for half)
-            ELSE (sugar / food_weight) * eating_percent       -- is_percent is FALSE: eating_percent is a raw gram value
+            WHEN is_percent = 1 THEN sugar * eating_percent
+            -- Check for a valid, positive food_weight before dividing
+            WHEN is_percent = 0 AND CAST(food_weight AS DECIMAL(10,2)) > 0 THEN (sugar / CAST(food_weight AS DECIMAL(10,2))) * eating_percent
+            -- Fallback: if food_weight is 0, NULL, or invalid, contribute 0 to the sum for this row
+            ELSE 0
           END
         ), 0), 1) AS sugar_g,
 
         ROUND(COALESCE(SUM(
           CASE
             WHEN is_percent = 1 THEN calories * eating_percent
-            ELSE (calories / food_weight) * eating_percent
+            WHEN is_percent = 0 AND CAST(food_weight AS DECIMAL(10,2)) > 0 THEN (calories / CAST(food_weight AS DECIMAL(10,2))) * eating_percent
+            ELSE 0
           END
         ), 0), 0) AS calories_kcal,
 
         SUM(
           CASE
             WHEN is_percent = 1 THEN carbohydrate * eating_percent
-            ELSE (carbohydrate / food_weight) * eating_percent
+            WHEN is_percent = 0 AND CAST(food_weight AS DECIMAL(10,2)) > 0 THEN (carbohydrate / CAST(food_weight AS DECIMAL(10,2))) * eating_percent
+            ELSE 0
           END
         ) AS carbohydrate,
 
         SUM(
           CASE
             WHEN is_percent = 1 THEN protein * eating_percent
-            ELSE (protein / food_weight) * eating_percent
+            WHEN is_percent = 0 AND CAST(food_weight AS DECIMAL(10,2)) > 0 THEN (protein / CAST(food_weight AS DECIMAL(10,2))) * eating_percent
+            ELSE 0
           END
         ) AS protein,
 
         SUM(
           CASE
             WHEN is_percent = 1 THEN fat * eating_percent
-            ELSE (fat / food_weight) * eating_percent
+            WHEN is_percent = 0 AND CAST(food_weight AS DECIMAL(10,2)) > 0 THEN (fat / CAST(food_weight AS DECIMAL(10,2))) * eating_percent
+            ELSE 0
           END
         ) AS fat
 
@@ -148,7 +152,6 @@ exports.getTodaySummary = (user_id) => {
     `;
     db.query(sql, [user_id], (err, results) => {
       if (err) return reject(err);
-      // Fallback for no results remains the same, but you might want to add the other fields
       resolve(results[0] || { 
           avg_health_score: 0, 
           sugar_g: 0, 
