@@ -99,20 +99,6 @@ exports.getInquiryById = async (id) => {
             resolve(results[0] || null);
         });
     });
-    if (!inquiry) return null;
-
-    // 2. 답변이 있을 때만 답변 조회
-    if (inquiry.is_answered) {
-        inquiry.answer = await new Promise((resolve, reject) => {
-            const answerSql = `SELECT * FROM inquiry_answer WHERE inquiry_id = ?`;
-            db.query(answerSql, [id], (err, answerResults) => {
-                if (err) return reject(err);
-                resolve(answerResults[0] || null);
-            });
-        });
-    } else {
-        inquiry.answer = null;
-    }
     return inquiry;
 };
 
