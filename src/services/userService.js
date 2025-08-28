@@ -103,18 +103,60 @@ exports.getTodaySummary = (user_id) => {
   return new Promise((resolve, reject) => {
     const sql = `
       SELECT
+        -- Health score is an average of the food type, not affected by quantity eaten.
         ROUND(COALESCE(AVG(CASE WHEN health_score <> -1 THEN health_score END), 0), 0) AS avg_health_score,
-        ROUND(COALESCE(SUM(sugar), 0), 1)         AS sugar_g,
-        ROUND(COALESCE(SUM(calories), 0), 0)      AS calories_kcal,
-        SUM(carbohydrate)                         AS carbohydrate,
-        SUM(protein)                              AS protein,
-        SUM(fat)                                  AS fat
+
+        -- For each nutrient, calculate the actual amount eaten before summing.
+        -- We use a CASE statement to handle the two different ways of recording portions.
+        ROUND(COALESCE(SUM(
+          CASE
+            WHEN is_percent = 1 THEN sugar * eating_percent -- is_percent is TRUE: eating_percent is a multiplier (e.g., 0.5 for half)
+            ELSE (sugar / food_weight) * eating_percent       -- is_percent is FALSE: eating_percent is a raw gram value
+          END
+        ), 0), 1) AS sugar_g,
+
+        ROUND(COALESCE(SUM(
+          CASE
+            WHEN is_percent = 1 THEN calories * eating_percent
+            ELSE (calories / food_weight) * eating_percent
+          END
+        ), 0), 0) AS calories_kcal,
+
+        SUM(
+          CASE
+            WHEN is_percent = 1 THEN carbohydrate * eating_percent
+            ELSE (carbohydrate / food_weight) * eating_percent
+          END
+        ) AS carbohydrate,
+
+        SUM(
+          CASE
+            WHEN is_percent = 1 THEN protein * eating_percent
+            ELSE (protein / food_weight) * eating_percent
+          END
+        ) AS protein,
+
+        SUM(
+          CASE
+            WHEN is_percent = 1 THEN fat * eating_percent
+            ELSE (fat / food_weight) * eating_percent
+          END
+        ) AS fat
+
       FROM eating_history
       WHERE user_id = ? AND DATE(eating_time) = CURDATE()
     `;
     db.query(sql, [user_id], (err, results) => {
       if (err) return reject(err);
-      resolve(results[0] || { avg_health_score: 0, sugar_g: 0, calories_kcal: 0 });
+      // Fallback for no results remains the same, but you might want to add the other fields
+      resolve(results[0] || { 
+          avg_health_score: 0, 
+          sugar_g: 0, 
+          calories_kcal: 0,
+          carbohydrate: 0,
+          protein: 0,
+          fat: 0
+      });
     });
   });
 };
