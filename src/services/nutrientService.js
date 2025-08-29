@@ -23,7 +23,7 @@ async function analyzeNutrients(imagePath, userInfo) {
     cholesterol: result.cholesterol || 0,
     saturated_fat: result.saturated_fat || 0,
     trans_fat: result.trans_fat || 0,
-    food_weight: result.food_weight || '0g',
+    food_weight: result.food_weight || '0',
     nutrient_list: result.ingredients || '',
     rating: result.rating || 1,
     review_text: result.review_text || '리뷰 없음',

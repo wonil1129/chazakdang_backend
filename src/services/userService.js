@@ -357,7 +357,7 @@ exports.insertEatingHistory = (user_id, data) => {
     return new Promise((resolve, reject) => {
         db.query(sql, values, (err, result) => {
             if (err) return reject(err);
-            resolve(result);
+            resolve({ id: result.insertId, ...data });
         })
     })
 };

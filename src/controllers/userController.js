@@ -142,32 +142,24 @@ exports.uploadNutrientsImage = async (req, res) => {
     const userInfo = await userService.getUserDetailedInfo(req.user.id);
     let nutrientData = await nutrientService.analyzeNutrients(req.file.path, userInfo);
     const product_image = 'uploads/product_images/placeholder.jpg';
+    
+    // ... (all your data processing and cleaning steps remain the same)
     try {
       nutrientData = await searchFoodData.getFoodDataFromProductID(nutrientData);
-    } catch (error) {
-      console.error(error);
-    }
+    } catch (error) { console.error(error); }
     try {
       nutrientData = await searchRawFoodData.getRawFoodDataFromProductID(nutrientData);
-    } catch (error) {
-      console.error(error);
-    }
+    } catch (error) { console.error(error); }
     try {
       nutrientData = sweetener_cleaner.clean_and_standardize_nutrients(nutrientData);
-    } catch (error) {
-      console.error(error);
-    }
+    } catch (error) { console.error(error); }
     try {
       nutrientData = await nutrientService.analyzeNutrients2(nutrientData, userInfo);
-    } catch (error) {
-      console.error(error);
-    }
+    } catch (error) { console.error(error); }
 
     if(nutrientData.analyzable) {
       try {
-        console.log('Sending data to Python script for prediction:', nutrientData);
         prediction = await predictionService.runPrediction(nutrientData);
-        console.log("prediction: ", prediction);
       } catch (error) {
         console.error('Error running prediction:', error);
         prediction = { predicted_value: -1 };
@@ -176,14 +168,11 @@ exports.uploadNutrientsImage = async (req, res) => {
       prediction = { predicted_value: -1 };
     }
 
-    res.json({
-      msg: 'Nutrients image uploaded successfully',
-      analyzeResult: nutrientData,
-      coupang: nutrient_image.includes('placeholder') ? { msg: 'No product image found' } : nutrient_image,
-      health_score: prediction.predicted_value ?? -1,
-    });
+    // --- [FIX START] ---
 
-    await userService.insertEatingHistory(user_id, {
+    // 1. Insert the record into the database FIRST.
+    // This assumes `insertEatingHistory` returns the newly created record with its ID.
+    const newRecord = await userService.insertEatingHistory(user_id, {
       ...nutrientData,
       product_image,
       nutrient_image,
@@ -192,6 +181,21 @@ exports.uploadNutrientsImage = async (req, res) => {
       is_percent: is_percent,
     });
 
+    // 2. Add the new ID to the nutrientData object that will be sent to the client.
+    nutrientData.id = newRecord.id;
+
+    // 3. Now, send the response with the complete data, including the new ID.
+    res.json({
+      msg: 'Nutrients image uploaded successfully',
+      analyzeResult: nutrientData, // This now contains the ID
+      coupang: nutrient_image.includes('placeholder') ? { msg: 'No product image found' } : nutrient_image,
+      health_score: prediction.predicted_value ?? -1,
+    });
+    
+    // --- [FIX END] ---
+
+    // You can run these updates after sending the response.
+    console.log("ID: ", newRecord.id);
     try {
       await rankingUpdater.updateDailyRanking();
       await rankingUpdater.updateWeeklyRanking();
@@ -199,7 +203,6 @@ exports.uploadNutrientsImage = async (req, res) => {
     } catch (error) {
       console.error(error);
     }
-
 
   } catch (err) {
     console.error('Upload error:', err);

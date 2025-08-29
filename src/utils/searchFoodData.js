@@ -40,7 +40,9 @@ exports.getFoodDataFromProductID = async (nutrientData) => {
                 }
 
                 const row = results[0];
-                const food_weight = parseFloat(row['식품중량'].replace(/[^\d.]/g, ''));
+                const match = row['식품중량'].toString().match(/[\d.]+/);
+                const food_weight = match ? parseFloat(match[0]) : 0;
+
                 console.log("food_weight: ", food_weight);
 
                 resolve({
@@ -55,7 +57,7 @@ exports.getFoodDataFromProductID = async (nutrientData) => {
                     cholesterol: recalculate_value(row['콜레스테롤_mg'], food_weight) ?? nutrientData.cholesterol,
                     saturated_fat: recalculate_value(row['포화지방산_g'], food_weight) ?? nutrientData.saturated_fat,
                     trans_fat: recalculate_value(row['트랜스지방산_g'], food_weight) ?? nutrientData.trans_fat,
-                    food_weight: row['식품중량'] ?? nutrientData.food_weight,
+                    food_weight: food_weight ?? nutrientData.food_weight,
                 });
             });
         });
