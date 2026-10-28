@@ -1,11 +1,38 @@
+# 비밀 값 / 인증서
 .env
-node_modules/
+.env.*
+!.env.example
 cert/*
 !cert/.gitkeep
+
+# 의존성 / 가상환경
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+
+# 사용자 업로드 파일 (폴더만 유지)
 uploads/profile_images/*
 !uploads/profile_images/.gitkeep
 uploads/nutrients_images/*
 !uploads/nutrients_images/.gitkeep
 uploads/product_images/*
 !uploads/product_images/.gitkeep
+
+# 로그 (폴더만 유지)
+logs/*
+!logs/.gitkeep
+
+# 대용량 원본 데이터
+data/
+
+# 백업 / 이전 버전 파일
+*.old
+*.old.*
+*.bak
+
+# 로컬 스크립트 / OS 파일
 restart.sh
+.DS_Store
+.vscode/
+.idea/

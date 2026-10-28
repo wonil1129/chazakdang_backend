@@ -26,15 +26,17 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Internal Server Error' });
 });
 
-require('./src//utils/scheduler'); // 스케줄러 미들웨어
+require('./src/utils/scheduler'); // 스케줄러 미들웨어
+
+const PORT = Number(process.env.PORT) || 3000;
 
 const sslOptions = {
   key: fs.readFileSync('./cert/server.key'),
   cert: fs.readFileSync('./cert/server.cert')
 };
 
-https.createServer(sslOptions, app).listen(3000, () => {
-  console.log('HTTPS Server running on port 3000');
+https.createServer(sslOptions, app).listen(PORT, () => {
+  console.log(`HTTPS Server running on port ${PORT}`);
 });
 
 

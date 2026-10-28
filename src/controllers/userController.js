@@ -3,7 +3,6 @@ const express = require('express');
 const router = express.Router();
 const userService = require('../services/userService');
 const nutrientService = require('../services/nutrientService');
-const productService = require('../services/productService');
 const path = require('path');
 const auth = require('../middleware/auth');
 const db = require('../../config/db');
