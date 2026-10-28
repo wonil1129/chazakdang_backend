@@ -1,670 +1,206 @@
-# Chazadang API 문서
+# 찾았당 (Chazadang) — Backend API
 
-Chazadang 애플리케이션의 공식 API 문서입니다. 이 가이드는 API 엔드포인트와 상호작용하는 데 필요한 모든 정보를 제공합니다.
+> 식품 **영양성분표 사진 한 장**으로 영양 점수와 대체당(인공 감미료) 정보를 알려주는 건강 관리 앱 **「찾았당」**의 REST API 서버입니다.
 
-## 기본 URL
+![Node.js](https://img.shields.io/badge/Node.js-339933?logo=nodedotjs&logoColor=white)
+![Express](https://img.shields.io/badge/Express_5-000000?logo=express&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)
+![Python](https://img.shields.io/badge/Python_(XGBoost)-3776AB?logo=python&logoColor=white)
+![Gemini](https://img.shields.io/badge/Google_Gemini-8E75B2?logo=googlegemini&logoColor=white)
 
-모든 API 엔드포인트는 다음 기본 URL을 기준으로 합니다.
+| 구분 | 내용 |
+|---|---|
+| 형태 | 팀 프로젝트 (Flutter 앱 + Node.js 백엔드) |
+| 기간 | 2025.07 ~ 2025.09 (포트폴리오 정리 2026.10) |
+| 본인 역할 | 백엔드 — 프로젝트 초기 구조, **랭킹 집계 시스템**, **1:1 문의 API**, DB 스키마 확장 ([상세](#-내-담당)) |
+| 프론트엔드 | Flutter 앱 (팀원 담당, 비공개 저장소) |
 
-`https://localhost:3000` `https://c1a4832edc2e.ngrok-free.app`
+<!-- 📸 데모: 앱 화면 GIF 또는 스크린샷을 여기에 추가하세요. 예) ![demo](docs/demo.gif) -->
 
-## 인증
+---
 
-대부분의 엔드포인트는 JWT(JSON Web Token)를 사용한 인증이 필요합니다. 요청을 인증하려면 `Authorization` 헤더에 `Bearer YOUR_JWT_TOKEN` 값을 포함해야 합니다.
+## 📌 어떤 서비스인가요?
 
+제로·저당 제품의 성분표에는 아스파탐, 수크랄로스 같은 대체당과 여러 영양 수치가 적혀 있지만, 일반 소비자가 바로 해석하기는 어렵습니다.
+찾았당은 사용자가 **성분표를 촬영하면** 다음을 한 번에 제공합니다.
+
+1. **영양 성분 자동 추출** — Gemini가 사진에서 열량·당류·나트륨 등 9개 영양소와 원재료를 읽어 JSON으로 구조화
+2. **건강 점수 예측** — 영양소 9개를 입력으로 XGBoost 회귀 모델이 건강 점수 산출
+3. **대체당 분석 · 맞춤 리뷰** — 원재료에서 대체당을 찾아 표준 이름으로 정리하고, 사용자의 나이·질병·임신 여부를 반영한 리뷰 생성
+4. **기록 · 랭킹** — 먹은 제품을 캘린더에 기록하고, 평균 건강 점수로 일간·주간·월간 랭킹 제공
+
+## 🏗 시스템 구조
+
+```mermaid
+flowchart LR
+    App["📱 Flutter 앱"] -- "HTTPS / JWT" --> API["Express API 서버"]
+    API --> DB[("MySQL")]
+    API -- "성분표 이미지 → JSON" --> Gemini["Google Gemini 2.5 Flash"]
+    API -- "품목보고번호로 원재료 조회" --> FS["식품안전나라 Open API"]
+    API -- "child_process (stdin/stdout)" --> Py["Python · XGBoost<br/>건강 점수 예측"]
+    Cron["⏰ cron 스케줄러"] -- "기간별 집계" --> DB
 ```
 
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+### 사진 분석 요청 흐름 (`POST /api/eating-history/product-image`)
 
+```mermaid
+sequenceDiagram
+    participant A as 앱
+    participant S as API 서버
+    participant G as Gemini
+    participant D as MySQL
+    participant P as Python 모델
+    A->>S: 성분표 사진 업로드 (multer)
+    S->>G: 1차 분석: 이미지 → 영양소·원재료·품목보고번호 (responseSchema로 JSON 고정)
+    S->>D: 품목보고번호로 식품 DB 보정 (+ 식품안전나라 API)
+    S->>S: 대체당 표준화 (문자열 유사도 0.6 이상 매칭)
+    S->>G: 2차 분석: 사용자 건강 정보 맞춤 리뷰
+    S->>P: 영양소 9개 → 건강 점수
+    S->>D: 식단 기록 저장 → 랭킹 갱신
+    S-->>A: 분석 결과 + 건강 점수
 ```
 
----
-
-1\. 인증 (`/api/auth`)
---------------------
-
-사용자 회원가입, 로그인, 아이디 유효성 검사를 처리합니다.
-
-### 회원가입
-새로운 사용자 계정을 생성합니다.
-
-- **메서드:** `POST`
-- **엔드포인트:** `/api/auth/register`
-- **Body:**
-  ```
-  {
-    "user_id": "newuser",
-    "user_pw": "password123",
-    "user_name": "UserName",
-    "age": 25,
-    "height": 180,
-    "weight": 75,
-    "sex": 1,
-    "preg": 0,
-    "dis": "없음"
-  }
-  ```
-
--   **성공 응답 (201):**
-
-    ```
-    {
-      "msg": "User registered successfully",
-      "token": "YOUR_JWT_TOKEN"
-    }
-
-    ```
-
-### 로그인
-
-사용자를 인증하고 JWT를 반환합니다.
-
--   **메서드:**  `POST`
-
--   **엔드포인트:**  `/api/auth/login`
-
--   **Body:**
-
-    ```
-    {
-      "user_id": "testuser",
-      "user_pw": "password123"
-    }
-
-    ```
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "msg": "Login successful",
-      "token": "YOUR_JWT_TOKEN",
-      "user": {
-        "id": "testuser",
-        "name": "UserName"
-      }
-    }
-
-    ```
-
-### 아이디 중복 확인
-
-사용자 아이디가 이미 사용 중인지 확인합니다.
-
--   **메서드:**  `POST`
-
--   **엔드포인트:**  `/api/auth/check-id`
-
--   **Body:**
-
-    ```
-    {
-      "user_id": "newuser"
-    }
-
-    ```
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "msg": "ID is available"
-    }
-
-    ```
-
-2\. 사용자 (`/api/users`)
-----------------------
-
-현재 인증된 사용자의 데이터를 관리합니다.
-
-### 내 기본 정보 조회
-
-기본 프로필 정보(아이디, 이름, 이미지)를 조회합니다.
-
--   **메서드:**  `GET`
-
--   **엔드포인트:**  `/api/users/me`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "id": "UserID",
-      "name": "UserName",
-      "profile_image": "uploads/profile_images/image-162987...jpg"
-    }
-
-    ```
-
-### 내 상세 정보 조회
-
-사용자의 모든 프로필 정보를 조회합니다.
-
--   **메서드:**  `GET`
-
--   **엔드포인트:**  `/api/users/me/profile`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "id": "UserID",
-      "name": "UserName",
-      "age": 25,
-      "height": 165,
-      "weight": 75,
-      "sex": 1,
-      "preg": 0,
-      "dis": "없음"
-    }
-
-    ```
-
-### 내 프로필 수정
-
-인증된 사용자의 프로필 정보를 수정합니다.
-
--   **메서드:**  `PUT`
-
--   **엔드포인트:**  `/api/users/me/profile`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **Body:**
-
-    ```
-    {
-      "user_name": "UserName",
-      "age": 26,
-      "height": 165,
-      "weight": 76,
-      "sex": 1,
-      "preg": 0,
-      "dis": "알러지"
-    }
-
-    ```
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "msg": "User info updated successfully"
-    }
-
-    ```
-
-### 프로필 이미지 업로드
-
-사용자의 프로필 이미지를 업로드하거나 업데이트합니다.
-
--   **메서드:**  `POST`
-
--   **엔드포인트:**  `/api/users/me/image`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **Body:**  `multipart/form-data` 형식, 필드 이름 `image`: 식품 이미지, `eating_percent`: 먹은 양(% 또는 gram), `is_percent`: %로 입력시 1, gram으로 입력시 0
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "msg": "Profile image uploaded successfully",
-      "image_url": "uploads/profile_images/image-162987...jpg"
-    }
-
-    ```
-
-### 오늘의 요약 조회
-
-사용자의 당일 건강 요약 정보를 조회합니다.
-
--   **메서드:**  `GET`
-
--   **엔드포인트:**  `/api/users/me/today-summary`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "name": "UserName",
-      "avg_health_score": 75,
-      "totals": {
-        "sugar_g": 25,
-        "calories_kcal": 1800,
-        "carbohydrate": 123,
-        "protein": 123,
-        "fat": 123
-      }
-    }
-
-    ```
-
-### 회원 탈퇴
-
-인증된 사용자의 계정을 삭제합니다.
-
--   **메서드:**  `DELETE`
-
--   **엔드포인트:**  `/api/users/me`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "msg": "Account deleted successfully."
-    }
-
-    ```
-
-3\. 식단 기록 (`/api/eating-history`)
----------------------------------
-
-사용자의 음식 섭취 기록을 관리합니다.
-
-### 최근 기록 조회
-
-가장 최근의 식단 기록을 조회합니다.
-
--   **메서드:**  `GET`
-
--   **엔드포인트:**  `/api/eating-history/recent?limit=3`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "msg": "Successfully fetched recent eating history",
-      "recentEatingHistory": [
-        {
-          "id": 101,
-          "eating_time": "2025-08-23T09:00:00.000Z",
-          "food_name": "프로틴바",
-          "product_image": "uploads/product_images/...",
-          "health_score": 85,
-          "nutrient_list": "...",
-          "review_text": "...",
-          "calories": 200,
-          "protein": 20,
-          "fat": 8,
-          "carbohydrate": 22,
-          "sugar": 5,
-          "sodium": 150,
-          "cholesterol": 75.6,
-          "saturated_fat": 23.52,
-          "trans_fat": 0.588,
-          "food_weight": "168g",
-          "product_image": "uploads/product_images/placeholder.jpg",
-          "nutrient_image": "uploads/nutrients_images/image-1756254574428-990832697.jpg",
-          "nutrient_list": "D-말티톨, 소비톨, 에리스리톨, 수크랄로스, 아세설팜칼륨, 폴리글리시톨",
-          "rating": 4,
-          "review_text": "이 제품은...",
-          "eating_percent": 55,
-          "is_percent": 0
-        }
-      ]
-    }
-
-    ```
-
-### 식단 기록 상세 조회
-
-ID로 특정 식단 기록의 모든 정보를 조회합니다.
-
--   **메서드:**  `GET`
-
--   **엔드포인트:**  `/api/eating-history/:id`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "id": 79,
-      "eating_time": "2025-08-22T12:30:00.000Z",
-      "food_name": "제로 콜라",
-      "product_image": "...",
-      "health_score": 90,
-      "nutrient_list": "...",
-      "review_text": "...",
-      "calories": 0,
-      "protein": 0,
-      "fat": 0,
-      "carbohydrate": 0,
-      "sugar": 0,
-      "sodium": 20
-    }
-
-    ```
-
-### 기록 수정
-
-특정 식단 기록을 수정합니다.
-
--   **메서드:**  `PATCH`
-
--   **엔드포인트:**  `/api/eating-history/:id`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **Body:**
-
-    ```
-    {
-      "rating": 5,
-      "review_text": "Gemini의 해당 음식 분석 text"
-    }
-
-    ```
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "msg": "Successfully updated eating history"
-    }
-
-    ```
-
-### 기록 삭제
-
-특정 식단 기록을 삭제합니다.
-
--   **메서드:**  `DELETE`
-
--   **엔드포인트:**  `/api/eating-history/:id`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "msg": "Successfully deleted eating history"
-    }
-
-    ```
-### 제품 이미지 분석 요청
-
-분석할 제품의 영양성분표 이미지를 업로드합니다.
-
--   **메서드:**  `POST`
-
--   **엔드포인트:**  `/api/eating-history/product-image`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **Body:**  `multipart/form-data` 형식, 필드 이름 `image`.
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "msg": "Nutrients image uploaded successfully",
-      "analyzeResult": { "...": "..." },
-      "coupang": "uploads/nutrients_images/image-162987...jpg",
-      "health_score": 78
-    }
-
-    ```
-
-4\. 캘린더 (`/api/calendar`)
--------------------------
-
-캘린더 기반으로 식단 기록을 조회합니다.
-
-### 특정 날짜 기록 조회
-
-지정된 날짜의 모든 식단 기록을 조회합니다.
-
--   **메서드:**  `POST`
-
--   **엔드포인트:**  `/api/calendar/date`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **Body:**
-
-    ```
-    {
-      "date": "2025-08-22"
-    }
-
-    ```
-
--   **성공 응답 (200):**
-
-    ```
-    [
-      {
-        "id": 200,
-        "health_score": 17.897,
-        "user_id": "jaesung",
-        "eating_time": "2025-08-27T00:30:04.000Z",
-        "food_name": "제로 초콜릿칩 쿠키",
-        "calories": 789.6,
-        "protein": 15.12,
-        "fat": 43.68,
-        "carbohydrate": 100.8,
-        "sugar": 0,
-        "sodium": 739.2,
-        "cholesterol": 75.6,
-        "saturated_fat": 23.52,
-        "trans_fat": 0.588,
-        "food_weight": "168g",
-        "product_image": "uploads/product_images/placeholder.jpg",
-        "nutrient_image": "uploads/nutrients_images/image-1756254574428-990832697.jpg",
-        "nutrient_list": "D-말티톨, 소비톨, 에리스리톨, 수크랄로스, 아세설팜칼륨, 폴리글리시톨",
-        "rating": 4,
-        "review_text": "test123",
-        "eating_percent": 0.8,
-        "is_percent": 1
-      }
-    ]
-
-    ```
-
-### 월별 기록 현황 조회
-
-주어진 월에 식단 기록이 있는 날짜들을 조회합니다.
-
--   **메서드:**  `GET`
-
--   **엔드포인트:**  `/api/calendar/status?month=2025-08`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "days_with_records": [9, 11, 12, 13, 22]
-    }
-
-    ```
-
-5\. 랭킹 (`/api/rankings`)
-------------------------
-
-건강 점수 기반의 사용자 랭킹을 제공합니다.
-
-### 기간별 랭킹 조회
-
-주어진 기간(일간/주간/월간)의 상위 10명과 현재 사용자의 랭킹을 조회합니다.
-
--   **메서드:**  `GET`
-
--   **엔드포인트:**  `/api/rankings?period=daily&date=2025-08-26` period: (`daily`, `weekly`, `monthly`) date: (`yyyy-mm-dd`)
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "top_10": [
-        {
-          "rank": 1,
-          "user_name": "UserA",
-          "profile_image": "...",
-          "score": 95
-        }
-      ],
-      "my_rank": {
-        "rank": 15,
-        "user_name": "UserA",
-        "profile_image": "...",
-        "score": 82
-      }
-    }
-
-    ```
-
-6\. 문의 (`/api/inquiry`)
-----------------------
-
-1대1 문의 기능
-
-### 사용자 문의 목록 조회
-
-사용자의 문의 목록을 조회합니다.
-
--   **메서드:**  `GET`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **엔드포인트:**  `/api/inquiry/List?page=1&limit=8`
-
--   **성공 응답 (200):**
-
-    ```
-    [
-      {
-        "id": 1,
-        "title": "첫 번째 게시글",
-        "inquiry_type": "서비스",
-        "is_answered": "1",
-        "created_at": "2025-08-23T09:00:00.000Z"
-      }
-    ]
-
-    ```
-
-### 문의 상세 조회
-
-단일 문의와 해당 문의의 답변을 조회합니다.
-
--   **메서드:**  `GET`
-
--   **엔드포인트:**  `/api/inquiry/:id`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **성공 응답 (200):**
-
-  ```
-    
-  {
-    "id": 3,
-    "user_id": "user11",
-    "inquiry_type": "서비스",
-    "title": "dddddd",
-    "content": "ㅇㅇㅇㅇㅇ",
-    "created_at": "2025-08-23T04:13:49.000Z",
-    "is_answered": 0,
-    "answer": null
-  }
-    
-
-  ```
-
-### 문의 작성
-
-새로운 문의를 작성합니다.
-
--   **메서드:**  `POST`
-
--   **엔드포인트:**  `/api/inquiry`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **Body:**
-
-    ```
-    {
-      "inquiry_type": "문의 종류",
-      "title": "새로운 문의 제목",
-      "content": "새로운 문의 내용"
-    }
-    ```
-
--   **성공 응답 (201):**
-
-    ```
-    {
-      "msg": "문의가 성공적으로 생성되었습니다."
-    }
-    ```
-
----
-
-### 문의 수정
-
-기존 문의를 수정합니다.
-
--   **메서드:**  `PATCH`
-
--   **엔드포인트:**  `/api/inquiry/:id`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **Body:**
-
-    ```
-    {
-      "inquiry_type": "수정 문의 유형",
-      "title": "수정할 글 제목",
-      "content": "수정할 글 내용입니다."
-    }
-    ```
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "msg": "문의가 성공적으로 수정되었습니다."
-    }
-    ```
-
----
-
-### 게시글 삭제
-
-게시글을 삭제합니다.
-
--   **메서드:**  `DELETE`
-
--   **엔드포인트:**  `/api/inquiry/:id`
-
--   **헤더:**  `Authorization: Bearer YOUR_JWT_TOKEN`
-
--   **성공 응답 (200):**
-
-    ```
-    {
-      "msg": "문의가 성공적으로 삭제되었습니다."
-    }
-    ```
+## 🧩 주요 기능 (API)
+
+전체 요청·응답 예시는 **[docs/API.md](docs/API.md)** 에 있습니다.
+
+| 도메인 | 엔드포인트 | 설명 |
+|---|---|---|
+| 인증 | `POST /api/auth/register` · `login` · `check-id` | 회원가입(건강 정보 포함), 로그인(JWT 발급), 아이디 중복 확인 |
+| 사용자 | `GET/PUT/DELETE /api/users/me…` | 프로필 조회·수정, 프로필 이미지, 오늘 섭취 요약, 회원 탈퇴 |
+| 식단 분석 | `POST /api/eating-history/product-image` | 성분표 사진 분석 → 점수·리뷰 생성 후 저장 |
+| 식단 기록 | `GET/PATCH/DELETE /api/eating-history/:id`, `recent` | 최근 기록, 상세, 섭취량(% 또는 g) 수정, 삭제 |
+| 캘린더 | `GET /api/calendar/status`, `POST /api/calendar/date` | 월별 기록 있는 날짜, 날짜별 기록 |
+| 랭킹 | `GET /api/rankings?period=daily\|weekly\|monthly` | 기간별 평균 건강 점수 TOP 10 + 내 순위 |
+| 1:1 문의 | `POST/GET/PATCH/DELETE /api/inquiry…` | 문의 작성·목록(유형 필터, 페이지네이션)·상세·수정·삭제 |
+
+## 🗂 데이터 모델
+
+```mermaid
+erDiagram
+    user ||--|| user_info : "건강 정보"
+    user ||--o{ eating_history : "식단 기록"
+    user ||--o{ ranking_log : "기간별 점수"
+    user ||--o{ user_inquiry : "문의"
+    user { varchar user_id PK
+           varchar user_pw "bcrypt"
+           varchar user_name
+           varchar profile_image }
+    user_info { int age
+                int height
+                int weight
+                bool sex
+                bool preg
+                varchar dis "질병" }
+    eating_history { int id PK
+                     float health_score
+                     float calories_sugar_sodium_etc "영양소 9종"
+                     text nutrient_list "대체당 목록"
+                     text review_text
+                     float eating_percent "섭취량"
+                     bool is_percent "% 또는 g" }
+    ranking_log { int id PK
+                  enum ranking_type "daily/weekly/monthly"
+                  float score
+                  date rank_date }
+    user_inquiry { int id PK
+                   enum inquiry_type
+                   varchar title
+                   text content
+                   bool is_answered }
+```
+
+전체 DDL: [`db/schema.sql`](db/schema.sql)
+
+## 🙋 내 담당
+
+> 팀 백엔드에서 아래 부분을 맡았습니다. (커밋 기록: `JWI112`, `정원일`)
+
+**1. 프로젝트 초기 구조 · DB 연결 (2025.07)**
+- 저장소 생성, Express 폴더 구조(routes / controllers / services) 구성
+- MySQL 연결 설정, `.env` 분리와 `.gitignore` 설정
+
+**2. 랭킹 집계 시스템** — `services/rankingUpdater.js`, `utils/scheduler.js`, `ranking_log` 테이블
+- 매 요청마다 전체 식단 기록을 집계하지 않도록, 기간별 평균 점수를 **`ranking_log`에 스냅샷으로 저장**하는 구조로 설계
+- `(user_id, ranking_type, rank_date)` 유니크 키 + `INSERT … ON DUPLICATE KEY UPDATE`로 **여러 번 실행해도 중복 없이 갱신**(멱등)되도록 구현
+- 집계는 트랜잭션으로 묶어 실패 시 롤백, `cron`으로 일·주·월 단위 스케줄 구성
+- 랭킹 조회 API 초기 버전 구현 (현재 조회 쿼리는 팀원이 윈도 함수 `RANK() OVER` 기반으로 개선)
+
+**3. 1:1 문의 API 전체** — `controllers/inquiryController.js`, `services/inquiryService.js`
+- 작성·목록·상세·수정·삭제 CRUD, 문의 유형 필터와 페이지네이션
+- `Joi`로 요청 값 검증, 수정 시 허용된 컬럼만 동적으로 `SET` 구성 (SQL 인젝션 방지를 위해 컬럼명 화이트리스트)
+- 수정·삭제는 `WHERE id = ? AND user_id = ?`로 본인 문의만 변경
+
+**4. 식단 기록 스키마 확장**
+- 대체당 목록·평점·리뷰 컬럼 추가, 섭취량을 **% 또는 g**으로 입력받는 구조(`eating_percent`, `is_percent`) 추가
+
+**5. 포트폴리오 정리 (2026.10)** — 아래 [개선 기록](#-트러블슈팅--개선-기록) 참고
+
+<details>
+<summary>팀원 담당 (커밋 기록 기준)</summary>
+
+- `jaeseong` — 사용자·식단 API, Gemini 분석 파이프라인, 건강 점수 모델 연동, 식품 데이터 처리
+- `HGYU0106` — 사용자 API 일부
+- `C6JW` — API · DB 문서
+</details>
+
+## 🔧 트러블슈팅 · 개선 기록
+
+| 문제 | 원인 | 해결 |
+|---|---|---|
+| 문서의 DDL로 DB를 만들면 `ranking_log` 생성 실패, 뒤따르는 문의 테이블도 생성 안 됨 | `rank_date DATE NOT NULL, unique` 처럼 잘못된 문법, 랭킹 upsert에 필요한 유니크 키 누락 | [`db/schema.sql`](db/schema.sql) 재작성, `UNIQUE (user_id, ranking_type, rank_date)` 명시 |
+| DB 접속 정보가 코드에 하드코딩 | 초기 개발 편의 | host·port·DB명까지 모두 환경변수화, [`.env.example`](.env.example) 정리, 앱 전용 최소 권한 계정 SQL 제공 ([`db/create_app_user.sql`](db/create_app_user.sql)) |
+| 저장소에 미사용 코드와 대용량 파일 | 기능 변경 후 정리 누락 | 사용하지 않는 크롤러 모듈, 92MB 원본 데이터, 구버전 모델 파일 제거 |
+| 자동화된 테스트가 없음 | — | [`test/api_test.sh`](test/api_test.sh): 인증·권한·CRUD·랭킹 등 29개 시나리오. Gemini를 mock으로 대체해 **외부 API 키 없이 전체 분석 흐름 검증**. [`test/frontend_replay.sh`](test/frontend_replay.sh): 앱이 보내는 요청 형식 그대로 재현해 프론트–백엔드 계약 확인 |
+
+**테스트로 발견해 수정 예정인 이슈**
+- [ ] 스케줄러가 집계 함수를 잘못된 이름(대소문자)으로 호출 → 자동 집계 미실행
+- [ ] 랭킹 기준일을 UTC로 계산 → 한국 시간 00~09시에 전날 기준으로 조회
+- [ ] 자정 cron이 막 시작된 새 기간(빈 데이터)을 집계
+- [ ] 문의 상세 조회에서 작성자 확인 누락 (다른 사용자 문의 열람 가능)
+
+## 🚀 실행 방법
+
+**필요 환경**: Node.js 18+, MySQL 8, Python 3.11+
+
+```bash
+# 1. 의존성
+npm ci
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # 건강 점수 모델용 (경로 고정: ./.venv)
+
+# 2. DB
+mysql -u root -p -e "CREATE DATABASE chazadang CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+mysql -u root -p --default-character-set=utf8mb4 chazadang < db/schema.sql
+mysql -u root -p < db/create_app_user.sql          # 비밀번호를 바꾼 뒤 실행
+
+# 3. 환경변수
+cp .env.example .env                                 # DB 계정, JWT_SECRET, GEMINI_API_KEY 등 입력
+
+# 4. HTTPS 인증서 (로컬 개발용 자체 서명)
+openssl req -x509 -newkey rsa:2048 -nodes -keyout cert/server.key -out cert/server.cert -days 365 -subj /CN=localhost
+
+# 5. 실행
+node index.js
+```
+
+**테스트**
+```bash
+bash test/run_server.sh                                    # Gemini mock으로 서버 실행
+BASE_URL=https://localhost:3000 bash test/api_test.sh     # 다른 터미널에서
+```
+
+## 📁 프로젝트 구조
+
+```
+├── index.js                 # 서버 진입점, 라우터 등록
+├── config/db.js             # MySQL 커넥션 풀 (환경변수)
+├── src/
+│   ├── routes/              # URL ↔ 컨트롤러 매핑
+│   ├── controllers/         # 요청 검증·응답
+│   ├── services/            # DB 쿼리, 랭킹 집계, 건강 점수 모델(Python) 호출
+│   ├── middleware/          # JWT 인증, 파일 업로드
+│   └── utils/               # Gemini 연동, 식품 데이터 조회, 대체당 정규화, 스케줄러
+├── db/                      # 스키마, 앱 전용 계정 SQL
+├── test/                    # API 스모크 테스트, 프론트 요청 재현
+└── docs/API.md              # API 명세
+```
